@@ -35,7 +35,7 @@ To build the firmware from the source, you need to have Arduino IDE installed on
 
     Once you found the Arduino configuration data folder, navigate to `\packages\adafruit\hardware\samd\1.2.9\variants\crickit_m0`.
 
-3. Download two files `variant.cpp` and `variant.h` from this repository and use them to replace the corresponding files in `crickit_m0` folder. 
+3. Download two files `variant.cpp` and `variant.h` from `boardDefinitions` folder this repository and use them to replace the corresponding files in `crickit_m0` folder. 
 
 4. Restart the Arduino IDE and select `Adafruti Crickit M0` in *Tools->Board* menu. 
 
