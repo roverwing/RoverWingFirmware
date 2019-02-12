@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <Adafruit_NeoPixel_ZeroDMA.h>
-#define NUM_PIXELS_MAX  25
+#define NUM_PIXELS_MAX  45
 #define RED    0x00FF0000
 #define GREEN  0x0000FF00
 #define BLUE   0x000000FF

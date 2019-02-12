@@ -4,14 +4,13 @@
 #include "wiring_private.h"
 
 // Motor configuration modes
-#define MOTOR_MODE_BRAKE 0
-#define MOTOR_MODE_FLOAT 1
+#define MOTOR_MODE_POWER 0 //includes brake
+#define MOTOR_MODE_COAST 1
 #define MOTOR_MODE_SPEEDPID 2
-#define MOTOR_MODE_POWER 3
-// For floating a motor:
+// For coasting a motor:
 // Normally, motor power is an int between -500...500
-// this special value indicates that the motor should be stopped in floating state
-#define POWER_FLOAT 1000
+// this special value indicates that the motor should be stopped in coast state
+#define POWER_COAST 1000
 
 
 /*
@@ -23,7 +22,7 @@ void setupTimers();
  * Correctly sets pin mode and peripherals for  motors, encoders, and servos pins
  */
 void setupMotorPins();
-//updates motors PID coefficients and target if they have been changed
+//updates motors mode,  PID coefficients and target if they have been changed
 void updateMotorsConfig();
 //resets motor encoders as needed
 void resetEncoders();

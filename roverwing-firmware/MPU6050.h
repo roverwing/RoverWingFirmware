@@ -136,7 +136,8 @@ const float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // compute zeta, the othe
 //assumes Wire1 has already been started
 bool isAvailableMPU6050();
 // configures and calibrates MPU6050
-void startMPU6050();
+//retunrs 1 on success, 0 on failure
+bool startMPU6050();
 void readAccelData();
 void readGyroData();
 

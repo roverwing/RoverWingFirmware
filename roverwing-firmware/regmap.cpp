@@ -56,7 +56,7 @@ uint16_t * sonarRaw    =(uint16_t *) &REGA[REGA_SONAR_RAW]; //in mm
 uint16_t * sonarAvg    =(uint16_t *) &REGA[REGA_SONAR]; //10*(distance in mm), after low pass filter
 //encoders
 volatile int32_t *  encoder = (int32_t *) &REGA[REGA_ENCODER];
-volatile int16_t *  speed   = (int16_t *) &REGA[REGA_SPEED];
+int16_t *  speed   = (int16_t *) &REGA[REGA_SPEED]; //speed in encoder counts/s
 // IMU
 uint8_t * imuStatus         = &REGA[REGA_IMU_STATUS];
 //acceleration data: accel[0]=x accel, accel[1]=y, accel[2]=z
@@ -76,7 +76,7 @@ int16_t * roll              =  (int16_t *) &REGA[REGA_ROLL];
 uint8_t * magStatus         = &REGA[REGA_MAG_STATUS];
 volatile int16_t * mag     = (int16_t *) &REGA[REGA_MAG];
 volatile int16_t *  heading = (int16_t *) &REGA[REGA_HEADING];
-// MAGNETOMETER
+// GPS
 uint8_t * gpsStatus         = &REGA[REGA_GPS_STATUS];
 volatile int32_t * gpsLat   = (int32_t *) &REGA[REGA_GPS_LAT];
 volatile int32_t * gpsLong  = (int32_t *) &REGA[REGA_GPS_LONG];

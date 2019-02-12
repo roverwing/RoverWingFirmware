@@ -15,16 +15,16 @@ void setupAnalogPins() {
 }
 void updateAnalogs(){
     uint16_t readValue;
-    uint8_t bitmask = (*analogBitmask)<<1|0x01; // last bit is always set -
-                                                // this in internal neopixel
+    //uint8_t bitmask = (*analogBitmask)<<1|0x01; // last bit is always set -
+                                                // this in voltage sensor
     for (uint8_t i=0; i<NUM_ANALOGS; i++) {
-        if (bitmask & (B00000001<<i) ) {
+        //if (bitmask & (B00000001<<i) ) {
             //analog input active
             readValue=myAnalogRead(PINS_ANALOG[i]);
             analogRaw[i]=readValue;
             //lowpass filter
             analogAvg[i]=0.8*analogAvg[i]+2*readValue;
-        }
+        //}
     }
 }
 

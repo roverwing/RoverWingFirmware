@@ -33,17 +33,22 @@ bool isAvailableMPU6050(){
 // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers
 // in the MPU
 // and then configures MPU6050 for normal use
-void startMPU6050() {
+bool startMPU6050() {
   uint8_t data[12]; // data array to hold accelerometer and gyro x, y, z, data
   uint16_t ii, packet_count, fifo_count;
   int32_t gyro_bias[3] = {0, 0, 0}, accel_bias[3] = {0, 0, 0};
   quat[0]=1.0f; quat[1]=0.0f;  quat[2]=0.0f; quat[3]=0.0f;
+  if (!isAvailableMPU6050()) {
+    Serial.println("Failed to connect to MPU050");
+    return false;
+  }
+  /*
   Serial.print("Quat: ");
   Serial.print(quat[0]); Serial.print('\t');
   Serial.print(quat[1]); Serial.print('\t');
   Serial.print(quat[2]); Serial.print('\t');
   Serial.println(quat[3]);
-
+  */
   // reset device, reset all registers, clear gyro and accelerometer bias registers
   i2cMasterWriteByte(MPU6050_ADDRESS, PWR_MGMT_1, 0x80); // Write a one to bit 7 reset bit; toggle reset device
   delay(100);
@@ -210,7 +215,7 @@ void startMPU6050() {
   // can join the I2C bus and all can be controlled by the MCU as master
   i2cMasterWriteByte(MPU6050_ADDRESS, INT_PIN_CFG, 0x22);
   i2cMasterWriteByte(MPU6050_ADDRESS, INT_ENABLE, 0x01);  // Enable data ready (bit 0) interrupt
-
+  return true;
 }
 
 void readAccelData() {

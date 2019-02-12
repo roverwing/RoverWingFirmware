@@ -19,7 +19,7 @@ extern volatile uint32_t  changeFlag; //defined in regmap.cpp
 extern  uint32_t * registerFlag;
 
 //
-uint32_t prevEncoder[]={0,0};//to hold previous values of encoders - for computing speed
+extern int32_t * prevEncoder;//to hold previous values of encoders - for computing speed
 
 
 
@@ -110,7 +110,7 @@ void resetEncoders(){
     //also, reset previou value, otherwise speed computation will go haywire
     prevEncoder[0]=0;
   }
-  if (b&0x01) { //reset encoder for motor1
+  if (b&0x02) { //reset encoder for motor2
     encoder[1]=0;
     prevEncoder[1]=0;
   }
@@ -145,10 +145,8 @@ void setMotors(){
   switch (motorMode[0]){
     case MOTOR_MODE_POWER:
       power1=motorPower[0]; break;
-    case MOTOR_MODE_FLOAT:
-      power1=POWER_FLOAT; break;//special value to indicate that it should be floating
-    case MOTOR_MODE_BRAKE:
-      power1=0; break;
+    case MOTOR_MODE_COAST:
+      power1=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
       power1=SpeedController1.update((float)speed[0]);
@@ -158,10 +156,8 @@ void setMotors(){
   switch (motorMode[1]){
     case MOTOR_MODE_POWER:
       power2=motorPower[1]; break;
-    case MOTOR_MODE_FLOAT:
-      power2=POWER_FLOAT; break;//special value to indicate that it should be floating
-    case MOTOR_MODE_BRAKE:
-      power2=0; break;
+    case MOTOR_MODE_COAST:
+      power2=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
       power2=SpeedController2.update((float)speed[1]);
@@ -176,7 +172,7 @@ void setMotors(){
 void setMotorsPower(int16_t power1, int16_t power2){
   //motor1; controlled by registers REG_TCC0_CCB2, REG_TCC0_CCB3:
   // pin duty pode is REG_TCC0_CCBx/500
-  if (power1==POWER_FLOAT) {
+  if (power1==POWER_COAST) {
     //motor shoudl be floated
     REG_TCC0_CCB2=0;
     REG_TCC0_CCB3=0;
@@ -190,7 +186,7 @@ void setMotorsPower(int16_t power1, int16_t power2){
   }
   //motor2; controlled by registers REG_TCC0_CCB0, REG_TCC0_CCB1:
   // pin duty pode is REG_TCC0_CCBx/500
-  if (power2==POWER_FLOAT) {
+  if (power2==POWER_COAST) {
     REG_TCC0_CCB0=0;
     REG_TCC0_CCB1=0;
   } else if (power2 >= 0) {
