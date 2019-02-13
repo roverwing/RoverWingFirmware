@@ -3,6 +3,9 @@
 #include <Arduino.h>
 #define REGA_SIZE32 30 //size of regiter A, in 4-byte (32 bit) units
 #define REGB_SIZE32 63 //size of regiter B, in 4-byte (32 bit) units
+//this will be defined in regmap.cpp
+extern  volatile byte * REGA;
+extern  volatile byte * REGB;
 
 /* REGISTER A - read-only
 
@@ -162,8 +165,94 @@ Bytes  Offset name     value               data type  description
 #define REGB_PIXEL_COMMAND     66
 #define REGB_PIXEL_COLORS      68
 
+
+
+// now, pointer/aliases - for direct access to registers. These are forward declarations,
+//the definitions are in regmap.cpp
+
+//Firmware version
+extern volatile uint8_t * fwVersion;
+//whoami
+extern volatile uint8_t * whoAmI;
+//analog inputs
+extern volatile uint16_t * analogRaw; //scale 0-1023
+extern volatile uint16_t * analogAvg; //filtered values, scale 0 -10230
+//sonars
+extern volatile uint16_t * sonarRaw; //in mm
+extern volatile uint16_t * sonarAvg; //10*(distance in mm), after low pass filter
+//encoders
+extern volatile int32_t *  encoder;
+extern volatile int16_t *  speed; //speed in encoder counts/s
+// IMU
+extern volatile uint8_t * imuStatus;
+//acceleration data: accel[0]=x accel, accel[1]=y, accel[2]=z
+//scale: LSB=1/16384 g
+extern volatile int16_t *  accel;
+//gyro data: gyro[0]=x rotation, gyro[1]=y, gyro[2]=z
+//LSB=250.0 / 32768.0 deg/s
+extern volatile int16_t *  gyro;
+//orientation, as a quaternion
+//quat[0] is real part, quat[1], quat[2], quat[3] are i-, j- and k-components respectively
+extern volatile float * quat;
+// yaw, pitch, roll, in units of 1/100 degree
+extern volatile int16_t * yaw;
+extern volatile int16_t * pitch;
+extern volatile int16_t * roll;
+// MAGNETOMETER
+extern volatile uint8_t * magStatus;
+extern volatile int16_t * mag;
+extern volatile int16_t *  heading;
+// GPS
+extern volatile uint8_t * gpsStatus;
+extern volatile int32_t * gpsLat;
+extern volatile int32_t * gpsLong;
+extern volatile uint32_t * gpsTimestamp;
+
+//////////////////////////////
+// Pointers to register B
+/////////////////////////////
+//Analog
+extern volatile byte * analogBitmask;
+//Sonars
+extern volatile byte * sonarBitmask;
+extern volatile uint16_t * sonarTimeout;
+
+// Servos
+extern volatile uint16_t * servoPosition;
+//motors
+extern volatile float    * motor1PID;
+extern volatile float    * motor2PID;
+extern volatile byte     * encoderReset;
+extern volatile uint8_t  * motorMode;
+extern volatile int16_t  * motorPower;
+extern volatile int32_t  * motorTarget;
+//imu, gps, magnetometer
+extern volatile uint8_t * imuConfig;
+extern volatile uint8_t * gpsConfig;
+extern volatile uint8_t * magConfig;
+// low voltage threshold
+extern volatile uint8_t * lowVoltage;
+//neopixels
+extern volatile uint8_t * numPixels;
+extern volatile uint8_t * pixelBrightness;
+extern volatile uint8_t * pixelCommand;
+extern volatile uint32_t * pixelColors;
+
+
+
+
 // flags. Whenever a register is written to, it sets one of the bits in
 // changeFlag (see regmap.cpp) These bits are given names below
+//change flags.  Whenever one of the registers is written to,
+// it sets one of the bits in changeFlag, to indicate
+// to the main loop that it needs processing
+extern uint32_t volatile changeFlag;
+
+// array to map register offsets (for REGB) to flag bits
+// instead of giving it static values, we will initialize it using a function
+// initRegmap
+extern uint32_t registerFlag[];
+
 #define FLAG_NONE 0x0
 #define FLAG_ANALOG (1ul)
 #define FLAG_SONAR_BITMASK ((1ul)<<1)

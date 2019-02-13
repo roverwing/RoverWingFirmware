@@ -1,4 +1,5 @@
 #include "sonars.h"
+#include "regmap.h"
 uint8_t activeSonar =0;
 volatile uint32_t pulseStart =0; //timestamp, in us
 volatile uint32_t pulseEnd =0;   //timestamp, in us
@@ -9,10 +10,7 @@ volatile uint8_t status =0 ; /* 0: ping completed 1: ping initiated
 uint8_t PINS_SONAR_ECHO[]={PIN_SONAR1_ECHO,PIN_SONAR2_ECHO, PIN_SONAR3_ECHO};
 uint8_t PINS_SONAR_TRIG[]={PIN_SONAR1_TRIG,PIN_SONAR2_TRIG, PIN_SONAR3_TRIG};
 
-extern uint16_t * sonarRaw; //array of distances reported by sonars, in mm
-extern uint16_t * sonarAvg; //10*(distance in mm), after low pass filter
-extern uint16_t * sonarTimeout; //timeout in us
-extern volatile byte * sonarBitmask;
+
 
 
 void setupSonarPins(){

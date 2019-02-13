@@ -12,6 +12,8 @@
 // this special value indicates that the motor should be stopped in coast state
 #define POWER_COAST 1000
 
+extern int32_t  prevEncoder[];//to hold previous values of encoders - for computing speed
+
 
 /*
  * Configures clock sources and others for timers TCC0 (used by motors),
@@ -35,7 +37,7 @@ void setMotorsPower(int16_t power1, int16_t power2);
  * of four numbers, representing pulsewidths  for 4 servos
  */
 
-void setServos(volatile uint16_t * positions);
+void setServos();
 /* Interrupt service routines for encoders */
 void ISR_enc1A();
 void ISR_enc1B();

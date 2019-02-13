@@ -1,25 +1,9 @@
 #include "motors.h"
 #include "pid.h"
 #include "regmap.h"
-//defined in regmap.cpp
-extern volatile int32_t * encoder;
-extern volatile int16_t * speed;
-// Servos
-extern volatile uint16_t * servoPosition;
-//motors
-extern volatile float    * motor1PID; //PID coefficients
-extern volatile float    * motor2PID;
-extern volatile uint8_t  * encoderReset;
-extern volatile uint8_t  * motorMode;
-extern volatile int16_t  * motorPower;
-extern volatile int32_t  * motorTarget;
-
-// Flags
-extern volatile uint32_t  changeFlag; //defined in regmap.cpp
-extern  uint32_t * registerFlag;
 
 //
-extern int32_t * prevEncoder;//to hold previous values of encoders - for computing speed
+int32_t  prevEncoder[]={0,0};//to hold previous values of encoders - for computing speed
 
 
 
@@ -199,11 +183,11 @@ void setMotorsPower(int16_t power1, int16_t power2){
   }
 }
 //setting servo positions
-void setServos(volatile uint16_t * positions){
-  REG_TCC2_CCB1=positions[0]; //servo1
-  REG_TCC2_CCB0=positions[1]; //servo2
-  REG_TCC1_CCB0=positions[2]; //servo3
-  REG_TCC1_CCB1=positions[3]; //servo4
+void setServos(){
+  REG_TCC2_CCB1=servoPosition[0]; //servo1
+  REG_TCC2_CCB0=servoPosition[1]; //servo2
+  REG_TCC1_CCB0=servoPosition[2]; //servo3
+  REG_TCC1_CCB1=servoPosition[3]; //servo4
 }
 /* ISR for encoders */
 void ISR_enc1A() {

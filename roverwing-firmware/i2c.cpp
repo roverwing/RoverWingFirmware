@@ -3,11 +3,7 @@
 #include "wiring_private.h"
 #include "regmap.h"
 volatile uint8_t requestAddress;
-extern volatile byte * REGA;
-extern volatile byte * REGB;
 // Flags
-extern volatile uint32_t  changeFlag; //defined in regmap.cpp
-extern  uint32_t * registerFlag;
 
 void i2cMasterBegin(int freq){
   Wire1.begin();

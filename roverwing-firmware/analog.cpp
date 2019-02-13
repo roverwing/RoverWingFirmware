@@ -1,8 +1,5 @@
 #include "analog.h"
-//defined in regmap.cpp
-extern volatile byte * analogBitmask; //bitmask of analog pins  that should be active. LSB is analog0(vsense), next is analog1, etc
-extern uint16_t * analogRaw; //raw readings, scale 0-1023
-extern uint16_t * analogAvg; //filtered values, scale 0 -10230
+#include "regmap.h"
 
 uint8_t PINS_ANALOG[]={PIN_A0,PIN_A1,PIN_A2,PIN_A3,PIN_A4,PIN_A5,PIN_A6};
 

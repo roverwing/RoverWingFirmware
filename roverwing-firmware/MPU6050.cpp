@@ -2,21 +2,6 @@
 #include "MPU6050.h"
 #include "regmap.h"
 
-//acceleration data: accel[0]=x accel, accel[1]=y, accel[2]=z
-//scale: LSB=1/16384 g
-extern int16_t *  accel;
-//gyro data: gyro[0]=x rotation, gyro[1]=y, gyro[2]=z
-//LSB=250.0 / 32768.0 deg/s
-extern int16_t *  gyro;
-//orientation, as a quaternion
-//quat[0] is real part, quat[1], quat[2], quat[3] are i-, j- and k-components respectively
-extern float * quat;
-//pointers to register addresses holding yaw, pitch, and roll values
-//in units of 1/100 degree
-extern int16_t * yaw;
-extern int16_t * pitch;
-extern int16_t * roll;
-
 
 //for keeping track of time
 float deltat = 0.0f;                              // integration time interval

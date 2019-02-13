@@ -13,59 +13,6 @@
 #define FW_VERSION_MINOR 9
 
 
-// pointers to registers; defined in regmap.cpp
-extern uint8_t          * fwVersion;
-extern uint8_t          * whoAmI;
-extern volatile int32_t *  encoder;
-extern          int16_t * speed;  //actual current motor speed as measured by encoder,
-                                  //in encoder ticks/s
-extern uint16_t         * sonarRaw; //raw readings, in mm
-extern volatile uint8_t * motorMode;
-extern uint16_t         * sonarAvg;
-extern uint16_t         * analogRaw; //raw readings, scale 0-1023
-extern uint16_t         * analogAvg; //filtered values, scale 0 -10230
-extern volatile uint16_t *  servoPosition;
-extern volatile int16_t  *  motorPower;
-extern volatile byte    *  sonarBitmask;
-extern volatile byte    *  analogBitmask;
-/////////////////////////////////////////////////
-//IMU data
-////////////////////////////////////////////////
-// 0/1
-extern uint8_t * imuStatus;
-extern volatile uint8_t * imuConfig;
-//acceleration data: accel[0]=x accel, accel[1]=y, accel[2]=z
-//scale: LSB=1/16384 g
-extern int16_t *  accel;
-//gyro data: gyro[0]=x rotation, gyro[1]=y, gyro[2]=z
-//LSB=250.0 / 32768.0 deg/s
-extern int16_t *  gyro;
-//orientation, as a quaternion
-//quat[0] is real part, quat[1], quat[2], quat[3] are i-, j- and k-components respectively
-extern float * quat;
-//pointers to register addresses holding yaw, pitch, and roll values
-//in units of 1/100 degree
-extern int16_t * yaw;
-extern int16_t * pitch;
-extern int16_t * roll;
-
-//llow voltahe threshold
-extern volatile uint8_t * lowVoltage;
-///////////////////////////////
-//neopixels
-//////////////////////////////
-extern volatile uint32_t * pixelColors;
-extern volatile uint8_t  * numPixels;
-extern volatile uint8_t  * pixelBrightness;
-
-
-//encoder computation
-int32_t  prevEncoder[2];
-
-//flags
-// Flags
-extern volatile uint32_t  changeFlag; //defined in regmap.cpp
-extern  uint32_t * registerFlag;
 
 
 //script own variables
@@ -115,6 +62,9 @@ void setup() {
     pixelColors[i]=GREEN;
   }
   updatePixels();
+  //temporary, FIXME
+  startMPU6050();
+  *imuStatus=0x01;
 }
 
 void loop() {
@@ -122,7 +72,7 @@ void loop() {
   //High priority: done every cycle
   if (isSet(FLAG_SERVO)){
     clearFlag(FLAG_SERVO);//unset the servo flag bit
-    setServos(servoPosition);
+    setServos();
   }
   if (isSet(FLAG_ENC_RESET)) {
     clearFlag(FLAG_ENC_RESET);
@@ -147,15 +97,16 @@ void loop() {
       //we just received the command to activate IMU!
       //let us try actvating it; if we succeed, let us set imuStatus to true.
       // WARNING: activating IMU takes aabout 1.5 seconds!!!
-      *imuStatus=startMPU6050();
-      Serial.print("Activating IMU: "); Serial.println(*imuStatus);
+      *imuStatus=0x01;
+      startMPU6050();
+      //Serial.print("Activating IMU: "); Serial.println(*imuStatus);
     } else {
       //we received the command to deactivate imu
-      *imuStatus = false;
+      //*imuStatus = false;
     }
   }
   //now, update all sensors
-  if (*imuStatus) {
+  if ((*imuStatus)) {
     updateMPU6050();
   }
   updateSonars();
@@ -214,7 +165,7 @@ void loop() {
     loopCount=0;
 
     //print IMU values
-    if (*imuStatus){
+    if ((*imuStatus)){
       MPU6050print();
     }
     //print encoders

@@ -1,9 +1,6 @@
 #include "regmap.h"
 #include "neopixel.h"
 
-extern volatile uint32_t * pixelColors;
-extern volatile uint8_t  * numPixels; //doesn't include internal neopixel; max=45
-extern volatile uint8_t  * pixelBrightness;
 
 Adafruit_NeoPixel_ZeroDMA pixels(NUM_PIXELS_MAX+1, PIN_NEOPIXEL, NEO_GRB);
 

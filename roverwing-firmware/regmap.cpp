@@ -1,10 +1,10 @@
 #include "regmap.h"
 //allocate memory for registers, aligned with 32-bit words
-int32_t REGA32[REGA_SIZE32];
-int32_t REGB32[REGB_SIZE32];
+volatile int32_t REGA32[REGA_SIZE32];
+volatile int32_t REGB32[REGB_SIZE32];
 //cast them as byte arrays
-byte * REGA = (byte *)REGA32;
-byte * REGB = (byte *)REGB32;
+volatile byte * REGA = (byte *)REGA32;
+volatile byte * REGB = (byte *)REGB32;
 //change flags.  Whenever one of the registers is written to,
 // it sets one of the bits in changeFlag, to indicate
 // to the main loop that it needs processing
@@ -45,39 +45,39 @@ void initRegmap(){
 // value =   REGA[REGA_ENCODER]|(REGA[REGA_ENCODER+1]<<8)|(REGA[REGA_ENCODER+2]<<16)|(REGA[REGA_ENCODER+3]<<24);
 /////////////////////////////
 //Firmware version
-uint8_t * fwVersion    = &REGA[REGA_FW_VERSION];
+volatile uint8_t * fwVersion    = &REGA[REGA_FW_VERSION];
 //whoami
-uint8_t * whoAmI       = &REGA[REGA_WHO_AM_I];
+volatile uint8_t * whoAmI       = &REGA[REGA_WHO_AM_I];
 //analog inputs
-uint16_t * analogRaw   =(uint16_t *) &REGA[REGA_ANALOG_RAW]; //scale 0-1023
-uint16_t * analogAvg   =(uint16_t *) &REGA[REGA_ANALOG]; //filtered values, scale 0 -10230
+volatile uint16_t * analogRaw   =(uint16_t *) &REGA[REGA_ANALOG_RAW]; //scale 0-1023
+volatile uint16_t * analogAvg   =(uint16_t *) &REGA[REGA_ANALOG]; //filtered values, scale 0 -10230
 //sonars
-uint16_t * sonarRaw    =(uint16_t *) &REGA[REGA_SONAR_RAW]; //in mm
-uint16_t * sonarAvg    =(uint16_t *) &REGA[REGA_SONAR]; //10*(distance in mm), after low pass filter
+volatile uint16_t * sonarRaw    =(uint16_t *) &REGA[REGA_SONAR_RAW]; //in mm
+volatile uint16_t * sonarAvg    =(uint16_t *) &REGA[REGA_SONAR]; //10*(distance in mm), after low pass filter
 //encoders
 volatile int32_t *  encoder = (int32_t *) &REGA[REGA_ENCODER];
-int16_t *  speed   = (int16_t *) &REGA[REGA_SPEED]; //speed in encoder counts/s
+volatile int16_t *  speed   = (int16_t *) &REGA[REGA_SPEED]; //speed in encoder counts/s
 // IMU
-uint8_t * imuStatus         = &REGA[REGA_IMU_STATUS];
+volatile uint8_t * imuStatus         = &REGA[REGA_IMU_STATUS];
 //acceleration data: accel[0]=x accel, accel[1]=y, accel[2]=z
 //scale: LSB=1/16384 g
-int16_t *  accel            = (int16_t *) &REGA[REGA_ACCEL];
+volatile int16_t *  accel            = (int16_t *) &REGA[REGA_ACCEL];
 //gyro data: gyro[0]=x rotation, gyro[1]=y, gyro[2]=z
 //LSB=250.0 / 32768.0 deg/s
-int16_t *  gyro             = (int16_t *) &REGA[REGA_GYRO];
+volatile int16_t *  gyro             = (int16_t *) &REGA[REGA_GYRO];
 //orientation, as a quaternion
 //quat[0] is real part, quat[1], quat[2], quat[3] are i-, j- and k-components respectively
-float * quat                =(float *) &REGA[REGA_QUAT];
+volatile float * quat                =(float *) &REGA[REGA_QUAT];
 // yaw, pitch, roll, in units of 1/100 degree
-int16_t * yaw               =  (int16_t *) &REGA[REGA_YAW];
-int16_t * pitch             =  (int16_t *) &REGA[REGA_PITCH];
-int16_t * roll              =  (int16_t *) &REGA[REGA_ROLL];
+volatile int16_t * yaw               =  (int16_t *) &REGA[REGA_YAW];
+volatile int16_t * pitch             =  (int16_t *) &REGA[REGA_PITCH];
+volatile int16_t * roll              =  (int16_t *) &REGA[REGA_ROLL];
 // MAGNETOMETER
-uint8_t * magStatus         = &REGA[REGA_MAG_STATUS];
+volatile uint8_t * magStatus         = &REGA[REGA_MAG_STATUS];
 volatile int16_t * mag     = (int16_t *) &REGA[REGA_MAG];
 volatile int16_t *  heading = (int16_t *) &REGA[REGA_HEADING];
 // GPS
-uint8_t * gpsStatus         = &REGA[REGA_GPS_STATUS];
+volatile uint8_t * gpsStatus         = &REGA[REGA_GPS_STATUS];
 volatile int32_t * gpsLat   = (int32_t *) &REGA[REGA_GPS_LAT];
 volatile int32_t * gpsLong  = (int32_t *) &REGA[REGA_GPS_LONG];
 volatile uint32_t * gpsTimestampg  = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
