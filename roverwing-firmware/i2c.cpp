@@ -67,6 +67,7 @@ void i2cSlaveReceiveEvent(int bytesReceived){
     //Serial.print("Wrote "); Serial.print(bytesReceived-1); Serial.print(" bytes to register "); Serial.println(offset);
     //set flag
     setFlag(registerFlag[offset]);
+    //Serial.println(changeFlag, BIN);
   } else {
     requestAddress=offset; //save for request handler
   }
