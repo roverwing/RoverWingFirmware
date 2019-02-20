@@ -271,7 +271,7 @@ extern uint32_t registerFlag[];
 #define FLAG_PIXEL_CONFIG ((1ul)<<14)
 #define FLAG_PIXEL_COLORS ((1ul)<<15)
 //composite flags
-#define FLAG_MOTOR (FLAG_MOTOR1_PID | FLAG_MOTOR2_PID |   FLAG_MOTOR_MODE | FLAG_MOTOR_POWER | FLAG_MOTOR_TARGET)
+#define FLAG_MOTOR_PID (FLAG_MOTOR1_PID | FLAG_MOTOR2_PID |  FLAG_MOTOR_TARGET)
 //finally, function-like macros and function  declarations
 #define isSet(F) (changeFlag & (uint32_t) F)
 #define setFlag(F)  changeFlag |= (uint32_t) F

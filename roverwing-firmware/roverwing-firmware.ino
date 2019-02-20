@@ -82,17 +82,18 @@ void loop() {
     clearFlag(FLAG_ENC_RESET);
     resetEncoders();
   }
-  if (isSet(FLAG_MOTOR)){
+  if (isSet(FLAG_MOTOR_PID)){
     updateMotorsConfig();
-    Serial.println("Updating motor configuration");
-    clearFlag(FLAG_MOTOR);//unset the motor flag bits
-    //now, compute the power to give to motors and actually
-    //set motors to that power
-    setMotors();
+    Serial.println("Updating motor PID  configuration");
     //Serial.print("Motor1 mode: "); Serial.println(motorMode[0] );
     //Serial.print("Motor2 mode: "); Serial.println(motorMode[1] );
-
   }
+  if (isSet(FLAG_MOTOR_MODE)||isSet(FLAG_MOTOR_POWER)){
+    clearFlag(FLAG_MOTOR_MODE);
+    clearFlag(FLAG_MOTOR_POWER);
+    setMotors();
+  }
+
   if (isSet(FLAG_PIXEL_CONFIG)) {
     clearFlag(FLAG_PIXEL_CONFIG);
     //FIXME
