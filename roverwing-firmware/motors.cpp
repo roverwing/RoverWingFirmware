@@ -103,6 +103,8 @@ void resetEncoders(){
 void updateMotorsConfig(){
   //first, check if PID coefficinets have changed
   if (isSet(FLAG_MOTOR1_PID)){
+    //Serial.println("Configuring PID");
+    //Serial.println(motor1PID[0]);
     clearFlag(FLAG_MOTOR1_PID);
     SpeedController1.configure(motor1PID);
     SpeedController1.reset();
@@ -133,7 +135,11 @@ void setMotors(){
       power1=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
-      power1=SpeedController1.update((float)speed[0]);
+      power1=MOTOR_MAX_POWER*SpeedController1.update((float)speed[0]); //500 is maximal power
+      //cap power
+      if (power1>MOTOR_MAX_POWER) power1=MOTOR_MAX_POWER;
+      else if (power1<-MOTOR_MAX_POWER) power1=-MOTOR_MAX_POWER;
+      //Serial.print("Power1: "); Serial.println(power1);
       break;
   }
   //now same for motor2
@@ -144,7 +150,10 @@ void setMotors(){
       power2=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
-      power2=SpeedController2.update((float)speed[1]);
+      power2=MOTOR_MAX_POWER*SpeedController2.update((float)speed[1]);
+      if (power2>MOTOR_MAX_POWER) power2=MOTOR_MAX_POWER;
+      else if (power2<-MOTOR_MAX_POWER) power2=-MOTOR_MAX_POWER;
+      //Serial.print("Power2: "); Serial.println(power2);
       break;
   }
   //finally, use the found values to set motor powers
@@ -152,21 +161,21 @@ void setMotors(){
 }
 
 //setting motors to given power, -500 ... 500 for each motor
-//special value of power POWER_FLOAT is used to indicate float state
+//special value of power POWER_COAST is used to indicate float state
 void setMotorsPower(int16_t power1, int16_t power2){
   //motor1; controlled by registers REG_TCC0_CCB2, REG_TCC0_CCB3:
   // pin duty pode is REG_TCC0_CCBx/500
   if (power1==POWER_COAST) {
-    //motor shoudl be floated
+    //motor shoudl be coasted
     REG_TCC0_CCB2=0;
     REG_TCC0_CCB3=0;
   } else  if (power1 >= 0) {
-    REG_TCC0_CCB2=500;
-    REG_TCC0_CCB3=500-power1;
+    REG_TCC0_CCB2=MOTOR_MAX_POWER;
+    REG_TCC0_CCB3=MOTOR_MAX_POWER-power1;
     //pin A should be always HIGH, pin B duty cycle should be 1- (power/500)
   } else {  //speed<0; pin B high, pin A duty cycle 1 - (|power|/500)=1+(power/500)
-    REG_TCC0_CCB2=500+power1;
-    REG_TCC0_CCB3=500;
+    REG_TCC0_CCB2=MOTOR_MAX_POWER+power1;
+    REG_TCC0_CCB3=MOTOR_MAX_POWER;
   }
   //motor2; controlled by registers REG_TCC0_CCB0, REG_TCC0_CCB1:
   // pin duty pode is REG_TCC0_CCBx/500
@@ -175,11 +184,11 @@ void setMotorsPower(int16_t power1, int16_t power2){
     REG_TCC0_CCB1=0;
   } else if (power2 >= 0) {
     //pin A should be always HIGH, pin B duty cycle should be 1- (power/500)
-    REG_TCC0_CCB0=500;
-    REG_TCC0_CCB1=500-power2;
+    REG_TCC0_CCB0=MOTOR_MAX_POWER;
+    REG_TCC0_CCB1=MOTOR_MAX_POWER-power2;
   } else {  //speed<0; pin B high, pin A duty cycle 1 - (|power|/500)=1+(power/500)
-    REG_TCC0_CCB0=500+power2;
-    REG_TCC0_CCB1=500;
+    REG_TCC0_CCB0=MOTOR_MAX_POWER+power2;
+    REG_TCC0_CCB1=MOTOR_MAX_POWER;
   }
 }
 //setting servo positions

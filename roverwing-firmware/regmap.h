@@ -122,7 +122,7 @@ Bytes  Offset name     value               data type  description
 48-49  REGB_MOTOR_POWER motorPower[0]      int16    motor power, -500...500
 50-51                   motorPower[1]      int16
 ------ MOTOR TARGET
-52-55  REGB_MOTOR_TARGET motorTarget[0]    int32
+52-55  REGB_MOTOR_TARGET motorTarget[0]    int32   in speed PID mode: speed  in enc ticks/s
 56-59                    motorTarget[1]    int32
 ------ IMU
 60    REGB_IMU_CONFIG                      byte     bit0: is IMU active?
@@ -271,7 +271,7 @@ extern uint32_t registerFlag[];
 #define FLAG_PIXEL_CONFIG ((1ul)<<14)
 #define FLAG_PIXEL_COLORS ((1ul)<<15)
 //composite flags
-#define FLAG_MOTOR (FLAG_MOTOR1_PID | FLAG_MOTOR2_PID |   FLAG_MOTOR_MODE | FLAG_MOTOR_POWER )
+#define FLAG_MOTOR (FLAG_MOTOR1_PID | FLAG_MOTOR2_PID |   FLAG_MOTOR_MODE | FLAG_MOTOR_POWER | FLAG_MOTOR_TARGET)
 //finally, function-like macros and function  declarations
 #define isSet(F) (changeFlag & (uint32_t) F)
 #define setFlag(F)  changeFlag |= (uint32_t) F

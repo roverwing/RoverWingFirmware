@@ -11,6 +11,7 @@
 // Normally, motor power is an int between -500...500
 // this special value indicates that the motor should be stopped in coast state
 #define POWER_COAST 1000
+#define MOTOR_MAX_POWER 500 
 
 extern int32_t  prevEncoder[];//to hold previous values of encoders - for computing speed
 

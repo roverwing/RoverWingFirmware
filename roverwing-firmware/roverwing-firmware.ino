@@ -84,10 +84,14 @@ void loop() {
   }
   if (isSet(FLAG_MOTOR)){
     updateMotorsConfig();
+    Serial.println("Updating motor configuration");
     clearFlag(FLAG_MOTOR);//unset the motor flag bits
     //now, compute the power to give to motors and actually
     //set motors to that power
     setMotors();
+    //Serial.print("Motor1 mode: "); Serial.println(motorMode[0] );
+    //Serial.print("Motor2 mode: "); Serial.println(motorMode[1] );
+
   }
   if (isSet(FLAG_PIXEL_CONFIG)) {
     clearFlag(FLAG_PIXEL_CONFIG);
@@ -137,6 +141,7 @@ void loop() {
     //if using PID for motors, update motor power
     if ((motorMode[0] == MOTOR_MODE_SPEEDPID) ||(motorMode[1] == MOTOR_MODE_SPEEDPID) ){
       setMotors();
+      //Serial.println("Setting PID");
     }
     if ((*imuStatus)){
       //compute yaw, pitch, roll and write to register
