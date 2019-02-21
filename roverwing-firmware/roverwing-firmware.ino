@@ -56,12 +56,7 @@ void setup() {
   *imuStatus = 0x00;
   //neopixels
   *pixelBrightness=(uint8_t)32;
-  *numPixels= (uint8_t)8;
-
   setupPixels();
-  for (int i=0; i<*numPixels; i++) {
-    pixelColors[i]=GREEN;
-  }
   updatePixels();
   //temporary, FIXME
   //startMPU6050();
