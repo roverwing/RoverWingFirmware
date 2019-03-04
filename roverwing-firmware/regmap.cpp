@@ -80,7 +80,7 @@ volatile int16_t *  heading = (int16_t *) &REGA[REGA_HEADING];
 volatile uint8_t * gpsStatus         = &REGA[REGA_GPS_STATUS];
 volatile int32_t * gpsLat   = (int32_t *) &REGA[REGA_GPS_LAT];
 volatile int32_t * gpsLong  = (int32_t *) &REGA[REGA_GPS_LONG];
-volatile uint32_t * gpsTimestampg  = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
+volatile uint32_t * gpsTimestamp  = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
 
 //////////////////////////////
 // Pointers to register B

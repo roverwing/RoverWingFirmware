@@ -8,9 +8,10 @@
 #include "i2c.h"
 #include "MPU6050.h"
 #include "neopixel.h"
+#include "gps.h"
 
 #define FW_VERSION_MAJOR 0
-#define FW_VERSION_MINOR 9
+#define FW_VERSION_MINOR 91
 //uncomment to allow debugging print to Serial.
 //#define DEBUG_PRINT
 
@@ -31,6 +32,7 @@ uint32_t intPixelColor=GREEN; //color for neopixel
 
 ///////////////////////////////////////////////////
 void setup() {
+  //SerialGPS.begin(9600);
   i2cMasterBegin(400000); //start I2C bus on Wire1 as master, in fast mode (400 kHz)
   i2cSlaveBegin();        //start i2c bus on Wire, as a slave
   initRegmap();
@@ -117,9 +119,17 @@ void loop() {
       *imuStatus = false;
     }
   }
+  if (isSet(FLAG_GPS_CONFIG)){
+    clearFlag(FLAG_GPS_CONFIG);
+    if (*gpsConfig) GPSinit();
+    else GPSstop();
+  }
   //now, update all sensors
   if ((*imuStatus)) {
     updateMPU6050();
+  }
+  if (*gpsStatus){
+    GPSupdate();
   }
   updateSonars();
   updateAnalogs();

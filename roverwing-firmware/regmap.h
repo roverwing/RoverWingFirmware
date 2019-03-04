@@ -1,7 +1,7 @@
 #ifndef _ROVERWING_REGMAP_H
 #define _ROVERWING_REGMAP_H
 #include <Arduino.h>
-#define REGA_SIZE32 30 //size of regiter A, in 4-byte (32 bit) units
+#define REGA_SIZE32 34 //size of regiter A, in 4-byte (32 bit) units
 #define REGB_SIZE32 63 //size of regiter B, in 4-byte (32 bit) units
 //this will be defined in regmap.cpp
 extern  volatile byte * REGA;
@@ -65,10 +65,10 @@ Bytes  Offset name     value               data type  description
 102-103 REGA_HEADING   heading             int16   heading in degrees; north=0, east=90
 ------ GPS -----------------------------------
 104     REGA_GPS_STATUS
-105     unused
-106-109 REGA_GPS_LAT   gpsLat              int32  latitude, in units of 10^{-7} degree (about 10cm)
-110-113 REGA_GPS_LONG  gpsLong             int32  longitude
-114-117 REGA_GPS_TIMESTAMP gpsTimestamp    uint32 timestamp of last measurement, in ms
+105-107    unused
+108-111 REGA_GPS_LAT   gpsLat              int32  latitude, in units of 10^{-7} degree (about 10cm)
+112-115 REGA_GPS_LONG  gpsLong             int32  longitude
+116-119 REGA_GPS_TIMESTAMP gpsTimestamp    uint32 timestamp of last measurement, in ms
 
 */
 #define REGA_FW_VERSION    0
@@ -90,9 +90,9 @@ Bytes  Offset name     value               data type  description
 #define REGA_MAG           96
 #define REGA_HEADING       102
 #define REGA_GPS_STATUS    104
-#define REGA_GPS_LAT       106
-#define REGA_GPS_LONG      110
-#define REGA_GPS_TIMESTAMP 114
+#define REGA_GPS_LAT       108
+#define REGA_GPS_LONG      112
+#define REGA_GPS_TIMESTAMP 116
 
 
 /*
@@ -130,7 +130,7 @@ Bytes  Offset name     value               data type  description
 ------ MAGNETOMETER
 61    REGB_MAG_CONFIG                      byte
 ------ GPS
-62    REGB_GPS_CONFIG
+62    REGB_GPS_CONFIG                      byte    1 if we need to activate gps
 ------ Low voltage cutoff
 63    REGB_LOW_VOLTAGE   lowVoltage       uint8_t  the low voltage threshold, in units of 0.1V
                                                    if voltage is below that, internal neopixel will blink yellow
