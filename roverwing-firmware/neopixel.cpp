@@ -1,6 +1,6 @@
 #include "regmap.h"
 #include "neopixel.h"
-
+volatile uint32_t pixelColorArray[NUM_PIXELS_MAX+1];
 
 Adafruit_NeoPixel_ZeroDMA pixels(NUM_PIXELS_MAX+1, PIN_NEOPIXEL, NEO_GRB);
 
@@ -13,8 +13,8 @@ void setupPixels(){
 
 void updatePixels(){
   pixels.setBrightness(*pixelBrightness);
-  for (int i=0; i<*numPixels; i++){
-    pixels.setPixelColor(i+1, pixelColors[i]); //note that we shift i by 1, leaving index 0 for internal neopixel
+  for (int i=1; i<=*numPixels; i++){
+    pixels.setPixelColor(i, pixelColorArray[i]); //note that we start with  1, leaving index 0 for internal neopixel
   }
   pixels.show();
 }

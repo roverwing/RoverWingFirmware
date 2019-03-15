@@ -1,7 +1,7 @@
 #ifndef _ROVERWING_REGMAP_H
 #define _ROVERWING_REGMAP_H
 #include <Arduino.h>
-#define REGA_SIZE32 34 //size of regiter A, in 4-byte (32 bit) units
+#define REGA_SIZE32 38 //size of regiter A, in 4-byte (32 bit) units
 #define REGB_SIZE32 63 //size of regiter B, in 4-byte (32 bit) units
 //this will be defined in regmap.cpp
 extern  volatile byte * REGA;
@@ -59,16 +59,19 @@ Bytes  Offset name     value               data type  description
 ------- MAGNETOMETER --- ----------------------
 94      REGA_MAG_STATUS magStatus          uint8
 95      unused
-96-97   REGA_MAG       mag[0]              int16   x-comp of magnetic field, in units of 1 milligauss=0.1uT
+96-97   REGA_MAG       mag[0]              int16   x-comp of magnetic field, in units of 0.92 milligauss=0.092uT
 98-99                  mag[1]              int16   y
 100-101                mag[2]              int16   z
-102-103 REGA_HEADING   heading             int16   heading in degrees; north=0, east=90
+102-103 unused
+104-105 REGA_MAG_OFFSET magOffset[0]       int16   x-comp of magnetometer offset currently in use (either from calibration of copied form magUsrOffset)
+106-107                magOffset[1]        int16   y
+108-109                magOffset[2]        int16   z
 ------ GPS -----------------------------------
-104     REGA_GPS_STATUS
-105-107    unused
-108-111 REGA_GPS_LAT   gpsLat              int32  latitude, in units of 10^{-7} degree (about 10cm)
-112-115 REGA_GPS_LONG  gpsLong             int32  longitude
-116-119 REGA_GPS_TIMESTAMP gpsTimestamp    uint32 timestamp of last measurement, in ms
+110     REGA_GPS_STATUS
+111    unused
+112-115 REGA_GPS_LAT   gpsLat              int32  latitude, in units of 10^{-7} degree (about 10cm)
+116-119 REGA_GPS_LONG  gpsLong             int32  longitude
+120-123 REGA_GPS_TIMESTAMP gpsTimestamp    uint32 timestamp of last measurement, in ms
 
 */
 #define REGA_FW_VERSION    0
@@ -88,11 +91,11 @@ Bytes  Offset name     value               data type  description
 #define REGA_ROLL          92
 #define REGA_MAG_STATUS    94
 #define REGA_MAG           96
-#define REGA_HEADING       102
-#define REGA_GPS_STATUS    104
-#define REGA_GPS_LAT       108
-#define REGA_GPS_LONG      112
-#define REGA_GPS_TIMESTAMP 116
+#define REGA_MAG_OFFSET    104
+#define REGA_GPS_STATUS    110
+#define REGA_GPS_LAT       112
+#define REGA_GPS_LONG      116
+#define REGA_GPS_TIMESTAMP 120
 
 
 /*
@@ -117,34 +120,46 @@ Bytes  Offset name     value               data type  description
 ------ MOTOR  MODE       -------------
 43     REGB_MOTOR_MODE  motorMode[0]        byte
 44                      motorMode[1]        byte
-45-47  reserved
+45     reserved
 ------ MOTOR POWER       -------------
-48-49  REGB_MOTOR_POWER motorPower[0]      int16    motor power, -500...500
-50-51                   motorPower[1]      int16
------- MOTOR TARGET
-52-55  REGB_MOTOR_TARGET motorTarget[0]    int32   in speed PID mode: speed  in enc ticks/s
-56-59                    motorTarget[1]    int32
------- IMU
-60    REGB_IMU_CONFIG                      byte     bit0: is IMU active?
+46-47  REGB_MOTOR_POWER motorPower[0]      int16    motor power, -500...500
+48-49                   motorPower[1]      int16
+------ MOTOR STEERING    -------------
+50-51  REGB_MOTOR_STEERING steering[0]     int16  see description in motor.h
+52-53                      steering[1]     int16
+54-55  unused
+------ MOTOR TARGET      -------------
+56-59  REGB_MOTOR_TARGET motorTarget[0]    int32   in speed PID mode: speed  in enc ticks/s
+60-63                    motorTarget[1]    int32
+------ IMU               -------------
+64    REGB_IMU_CONFIG                      byte     bit0: is IMU active?
                                                     bits 2:1 : IMU orientation
+65    unused
+66-67 REGB_GYRO_OFFSET   gyroUsrOffset[0]  int16    gyro offset x, provided by user
+68-69                    gyroUsrOffset[1]  int16    y
+70-71                    gyroUsrOffset[2]  int16    z
+72-73 REGB_ACCEL_OFFSET  accelUsrOffset[0] int16    accel offset x, provided by user
+74-75                    accelUsrOffset[1] int16    y
+76-77                    accelUsrOffset[2] int16    z
 ------ MAGNETOMETER
-61    REGB_MAG_CONFIG                      byte
+78    REGB_MAG_CONFIG                      byte    see definition of modes in mag.h
+79     unused
+80-81 REGB_MAG_OFFSET    magUsrOffset[0]   int16   x-offset for magnetometer provided by user
+82-83                    magUsrOffset[1]   int16   y-offset for magnetometer
+84-85                    magUsrOffset[2]   int16   z-offset for magnetometer
 ------ GPS
-62    REGB_GPS_CONFIG                      byte    1 if we need to activate gps
+86    REGB_GPS_CONFIG                      byte    1 if we need to activate gps
 ------ Low voltage cutoff
-63    REGB_LOW_VOLTAGE   lowVoltage       uint8_t  the low voltage threshold, in units of 0.1V
+87    REGB_LOW_VOLTAGE   lowVoltage       uint8_t  the low voltage threshold, in units of 0.1V
                                                    if voltage is below that, internal neopixel will blink yellow
 ----- NEOPIXELS_CONFIG
-64    REGB_NUM_PIXELS  numPixels          uint8    actual number of used neopixels (at most 45)
+88    REGB_NUM_PIXELS  numPixels          uint8    actual number of used neopixels (at most 255)
                                                    doesn't include internal neopixel
-65    REGB_PIXEL_BRIGHTNESS  pixelBrightness uint8 neopixel brightness, 0-255
-66    REGB_PIXEL_COMMAND                  uint8    command to start/update/stop pixels
-67     unused
+89    REGB_PIXEL_BRIGHTNESS  pixelBrightness uint8 neopixel brightness, 0-255
+90    REGB_PIXEL_COMMAND                  uint8    command to start/update/stop pixels
+91    unused
 ----- NEOPIXELS_COlORS
-68-71 REGB_PIXEL_COLORS                   uint32   color of 1st neopixel (00RRGGBB)
-72-75                                     uint32   color of 2nd neopixel
-...
-244-247                                   uint32   color of 45th (last) neopixel
+92-95 REGB_PIXEL_COLOR                    uint32   neopixel color data  (nnRRGGBB), where nn is the pixel index (1-255)
 */
 #define REGB_ANALOG_BITMASK    0
 #define REGB_SONAR_BITMASK     1
@@ -154,16 +169,20 @@ Bytes  Offset name     value               data type  description
 #define REGB_MOTOR2_PID        28
 #define REGB_ENC_RESET         42
 #define REGB_MOTOR_MODE        43
-#define REGB_MOTOR_POWER       48
-#define REGB_MOTOR_TARGET      52
-#define REGB_IMU_CONFIG        60
-#define REGB_MAG_CONFIG        61
-#define REGB_GPS_CONFIG        62
-#define REGB_LOW_VOLTAGE       63
-#define REGB_NUM_PIXELS        64
-#define REGB_PIXEL_BRIGHTNESS  65
-#define REGB_PIXEL_COMMAND     66
-#define REGB_PIXEL_COLORS      68
+#define REGB_MOTOR_POWER       46
+#define REGB_MOTOR_STEERING    50
+#define REGB_MOTOR_TARGET      56
+#define REGB_IMU_CONFIG        64
+#define REGB_GYRO_OFFSET       66
+#define REGB_ACCEL_OFFSET      72
+#define REGB_MAG_CONFIG        78
+#define REGB_MAG_OFFSET        80
+#define REGB_GPS_CONFIG        86
+#define REGB_LOW_VOLTAGE       87
+#define REGB_NUM_PIXELS        88
+#define REGB_PIXEL_BRIGHTNESS  89
+#define REGB_PIXEL_COMMAND     90
+#define REGB_PIXEL_COLOR       92
 
 
 
@@ -201,7 +220,7 @@ extern volatile int16_t * roll;
 // MAGNETOMETER
 extern volatile uint8_t * magStatus;
 extern volatile int16_t * mag;
-extern volatile int16_t *  heading;
+extern volatile int16_t * magOffset;
 // GPS
 extern volatile uint8_t * gpsStatus;
 extern volatile int32_t * gpsLat;
@@ -225,18 +244,22 @@ extern volatile float    * motor2PID;
 extern volatile byte     * encoderReset;
 extern volatile uint8_t  * motorMode;
 extern volatile int16_t  * motorPower;
+extern volatile int16_t  * steering;
 extern volatile int32_t  * motorTarget;
 //imu, gps, magnetometer
 extern volatile uint8_t * imuConfig;
+extern volatile int16_t * gyroUsrOffset;
+extern volatile int16_t * accelUsrOffset;
 extern volatile uint8_t * gpsConfig;
 extern volatile uint8_t * magConfig;
+extern volatile int16_t * magUsrOffset;
 // low voltage threshold
 extern volatile uint8_t * lowVoltage;
 //neopixels
 extern volatile uint8_t * numPixels;
 extern volatile uint8_t * pixelBrightness;
 extern volatile uint8_t * pixelCommand;
-extern volatile uint32_t * pixelColors;
+extern volatile uint32_t * pixelColor;
 
 
 
@@ -262,15 +285,19 @@ extern uint32_t registerFlag[];
 #define FLAG_ENC_RESET ((1ul)<<5)
 #define FLAG_MOTOR_MODE ((1ul)<<6)
 #define FLAG_MOTOR_POWER ((1ul)<<7)
-#define FLAG_MOTOR_TARGET ((1ul)<<8)
-#define FLAG_IMU_CONFIG ((1ul)<<9)
-#define FLAG_MAG_CONFIG ((1ul)<<10)
-#define FLAG_GPS_CONFIG ((1ul)<<11)
-#define FLAG_LOW_VOLTAGE ((1ul)<<12)
-#define FLAG_NUM_PIXELS ((1ul)<<13)
-#define FLAG_PIXEL_CONFIG ((1ul)<<14)
-#define FLAG_PIXEL_COLORS ((1ul)<<15)
+#define FLAG_MOTOR_STEERING ((1ul)<<8)
+#define FLAG_MOTOR_TARGET ((1ul)<<9)
+#define FLAG_IMU_CONFIG ((1ul)<<10)
+#define FLAG_GYRO_OFFSET ((1ul)<<11)
+#define FLAG_ACCEL_OFFSET ((1ul)<<12)
+#define FLAG_MAG_CONFIG ((1ul)<<13)
+#define FLAG_MAG_OFFSET ((1ul)<<14)
+#define FLAG_GPS_CONFIG ((1ul)<<15)
+#define FLAG_LOW_VOLTAGE ((1ul)<<16)
+#define FLAG_PIXEL_CONFIG ((1ul)<<17)
+#define FLAG_PIXEL_COLOR ((1ul)<<18)
 //composite flags
+//FIXME: motor steering?
 #define FLAG_MOTOR_PID (FLAG_MOTOR1_PID | FLAG_MOTOR2_PID |  FLAG_MOTOR_TARGET)
 //finally, function-like macros and function  declarations
 #define isSet(F) (changeFlag & (uint32_t) F)

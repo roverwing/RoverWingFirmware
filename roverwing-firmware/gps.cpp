@@ -3,13 +3,13 @@
 NMEAGPS  gps; // This parses the GPS characters
 gps_fix  fix; // This holds on to the latest values
 uint32_t fixTimestamp; //timestamp of last time we got a fix, in ms
-void GPSinit(){
+void GPSbegin(){
   gpsPort.begin(9600);
   *gpsStatus = GPS_WAITING;
   *gpsLat =0;
   *gpsLong=0;
 }
-void GPSstop(){
+void GPSend(){
   gpsPort.end();
   *gpsStatus = GPS_OFF;
 }

@@ -26,13 +26,17 @@ void initRegmap(){
   registerFlag[REGB_ENC_RESET] = FLAG_ENC_RESET;
   for (i=0; i<2; i++)  registerFlag[REGB_MOTOR_MODE+i] = FLAG_MOTOR_MODE;
   for (i=0; i<4; i++)  registerFlag[REGB_MOTOR_POWER+i] = FLAG_MOTOR_POWER;
+  for (i=0; i<4; i++)  registerFlag[REGB_MOTOR_STEERING+i] = FLAG_MOTOR_STEERING;
   for (i=0; i<8; i++)  registerFlag[REGB_MOTOR_TARGET+i] = FLAG_MOTOR_TARGET;
   registerFlag[REGB_IMU_CONFIG] = FLAG_IMU_CONFIG;
+  for (i=0; i<6; i++)  registerFlag[REGB_GYRO_OFFSET+i] = FLAG_GYRO_OFFSET;
+  for (i=0; i<6; i++)  registerFlag[REGB_ACCEL_OFFSET+i] = FLAG_ACCEL_OFFSET;
   registerFlag[REGB_MAG_CONFIG] = FLAG_MAG_CONFIG;
+  for (i=0; i<6; i++)  registerFlag[REGB_MAG_OFFSET+i] = FLAG_MAG_OFFSET;
   registerFlag[REGB_GPS_CONFIG] = FLAG_GPS_CONFIG;
   registerFlag[REGB_LOW_VOLTAGE] = FLAG_LOW_VOLTAGE;
   for (i=0; i<3; i++)  registerFlag[REGB_NUM_PIXELS+i] = FLAG_PIXEL_CONFIG;
-  for (i=REGB_PIXEL_COLORS; i<REGB_SIZE32*4; i++)  registerFlag[i] = FLAG_PIXEL_COLORS;
+  registerFlag[REGB_PIXEL_COLOR] = FLAG_PIXEL_COLOR;
 
 }
 
@@ -74,13 +78,13 @@ volatile int16_t * pitch             =  (int16_t *) &REGA[REGA_PITCH];
 volatile int16_t * roll              =  (int16_t *) &REGA[REGA_ROLL];
 // MAGNETOMETER
 volatile uint8_t * magStatus         = &REGA[REGA_MAG_STATUS];
-volatile int16_t * mag     = (int16_t *) &REGA[REGA_MAG];
-volatile int16_t *  heading = (int16_t *) &REGA[REGA_HEADING];
+volatile int16_t * mag               = (int16_t *) &REGA[REGA_MAG];
+volatile int16_t * magOffset         = (int16_t *) &REGA[REGA_MAG_OFFSET];
 // GPS
 volatile uint8_t * gpsStatus         = &REGA[REGA_GPS_STATUS];
-volatile int32_t * gpsLat   = (int32_t *) &REGA[REGA_GPS_LAT];
-volatile int32_t * gpsLong  = (int32_t *) &REGA[REGA_GPS_LONG];
-volatile uint32_t * gpsTimestamp  = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
+volatile int32_t * gpsLat            = (int32_t *) &REGA[REGA_GPS_LAT];
+volatile int32_t * gpsLong           = (int32_t *) &REGA[REGA_GPS_LONG];
+volatile uint32_t * gpsTimestamp     = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
 
 //////////////////////////////
 // Pointers to register B
@@ -99,15 +103,19 @@ volatile float    * motor2PID     = (float *) &REGB[REGB_MOTOR2_PID];
 volatile byte     * encoderReset  = &REGB[REGB_ENC_RESET];
 volatile uint8_t  * motorMode     = &REGB[REGB_MOTOR_MODE];
 volatile int16_t  * motorPower    = (int16_t *) &REGB[REGB_MOTOR_POWER];
+volatile int16_t  * steering      = (int16_t *) &REGB[REGB_MOTOR_STEERING];
 volatile int32_t  * motorTarget   = (int32_t *) &REGB[REGB_MOTOR_TARGET];
 //imu, gps, magnetometer
 volatile uint8_t * imuConfig      = &REGB[REGB_IMU_CONFIG];
+volatile int16_t * gyroUsrOffset  = (int16_t *) &REGB[REGB_GYRO_OFFSET];
+volatile int16_t * accelUsrOffset = (int16_t *) &REGB[REGB_ACCEL_OFFSET];
 volatile uint8_t * gpsConfig      = &REGB[REGB_GPS_CONFIG];
 volatile uint8_t * magConfig      = &REGB[REGB_MAG_CONFIG];
+volatile int16_t * magUsrOffset   = (int16_t *) &REGB[REGB_MAG_OFFSET];
 // low voltage threshold
 volatile uint8_t * lowVoltage     = &REGB[REGB_LOW_VOLTAGE];
 //neopixels
 volatile uint8_t * numPixels      = (uint8_t *) &REGB[REGB_NUM_PIXELS];
 volatile uint8_t * pixelBrightness = (uint8_t *) &REGB[REGB_PIXEL_BRIGHTNESS];
 volatile uint8_t * pixelCommand   = (uint8_t *) &REGB[REGB_PIXEL_COMMAND];
-volatile uint32_t * pixelColors   = (uint32_t *) &REGB[REGB_PIXEL_COLORS];
+volatile uint32_t * pixelColor    = (uint32_t *) &REGB[REGB_PIXEL_COLOR];

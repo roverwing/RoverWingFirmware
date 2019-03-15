@@ -7,11 +7,13 @@
 #include "analog.h"
 #include "i2c.h"
 #include "MPU6050.h"
-#include "neopixel.h"
 #include "gps.h"
+#include "mag.h"
+#include "neopixel.h"
+
 
 #define FW_VERSION_MAJOR 0
-#define FW_VERSION_MINOR 91
+#define FW_VERSION_MINOR 95
 //uncomment to allow debugging print to Serial.
 //#define DEBUG_PRINT
 
@@ -90,14 +92,9 @@ void loop() {
     clearFlag(FLAG_MOTOR_POWER);
     setMotors();
   }
-
-  if (isSet(FLAG_PIXEL_CONFIG)) {
-    clearFlag(FLAG_PIXEL_CONFIG);
-    //FIXME
-    updatePixels(); //updates brightness, copies pixel colors and then calls pixel.show();
-  }
   if (isSet(FLAG_IMU_CONFIG)){
     clearFlag(FLAG_IMU_CONFIG);
+    //FIXME: user provided offsets!
     //debug!
     /*servoPosition[0]=1000;
     setServos();
@@ -111,25 +108,54 @@ void loop() {
       //let us try actvating it; if we succeed, let us set imuStatus to true.
       // WARNING: activating IMU takes aabout 1.5 seconds!!!
       delay(500);
-      startMPU6050();
-      *imuStatus=(uint8_t) isAvailableMPU6050();
+      MPU6050begin();
+#ifdef DEBUG_PRINT
       Serial.print("Activating IMU: "); Serial.println(*imuStatus);
+#endif
     } else {
       //we received the command to deactivate imu
       *imuStatus = false;
     }
   }
+  if (isSet(FLAG_MAG_OFFSET)){
+    clearFlag(FLAG_MAG_OFFSET);
+    //user provided offsets for magnetometer; let us use them
+    magApplyUsrOffsets();
+  }
+  if (isSet(FLAG_MAG_CONFIG)){
+    clearFlag(FLAG_MAG_CONFIG);
+    switch (*magConfig){
+      case MAG_CONFIG_END: //stop
+        magEnd();
+        break;
+      case MAG_CONFIG_BEGIN://begin
+        magBegin();
+        break;
+      case MAG_CONFIG_CALIBRATE: //calibrate
+        magCalibrate();
+        break;
+    }
+  }
   if (isSet(FLAG_GPS_CONFIG)){
     clearFlag(FLAG_GPS_CONFIG);
-    if (*gpsConfig) GPSinit();
-    else GPSstop();
+    if (*gpsConfig) GPSbegin();
+    else GPSend();
+  }
+  if (isSet(FLAG_PIXEL_CONFIG)) {
+    clearFlag(FLAG_PIXEL_CONFIG);
+    //FIXME
+    updatePixels(); //updates brightness, copies pixel colors and then calls pixel.show();
   }
   //now, update all sensors
   if ((*imuStatus)) {
-    updateMPU6050();
+   MPU6050update();
   }
   if (*gpsStatus){
     GPSupdate();
+  }
+  if (*magStatus==MAG_STATUS_ON) {
+    //magnetometer active
+    magUpdate();
   }
   updateSonars();
   updateAnalogs();

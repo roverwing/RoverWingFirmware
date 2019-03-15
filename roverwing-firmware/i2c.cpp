@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include "wiring_private.h"
 #include "regmap.h"
+#include "neopixel.h" //neopixel is treated specially
 volatile uint8_t requestAddress;
 // Flags
 
@@ -65,9 +66,16 @@ void i2cSlaveReceiveEvent(int bytesReceived){
       REGB[offset+i]=Wire.read();
     }
     //Serial.print("Wrote "); Serial.print(bytesReceived-1); Serial.print(" bytes to register "); Serial.println(offset);
-    //set flag
-    setFlag(registerFlag[offset]);
-    //Serial.println(changeFlag, BIN);
+    if (offset==REGB_PIXEL_COLOR){
+      //let's deal with it right away, before it gets overwritten
+      uint32_t c=(REGB[REGB_PIXEL_COLOR+2]<<16)|(REGB[REGB_PIXEL_COLOR+1]<<8)|(REGB[REGB_PIXEL_COLOR]); //RGB
+      uint8_t n=(uint8_t)(REGB[REGB_PIXEL_COLOR+3]); //pixel index
+      pixelColorArray[n]=c;
+    } else {
+      //set flag and let the main loop deal with it
+      setFlag(registerFlag[offset]);
+      //Serial.println(changeFlag, BIN);
+    }
   } else {
     requestAddress=offset; //save for request handler
   }
