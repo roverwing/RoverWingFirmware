@@ -4,22 +4,23 @@ volatile uint32_t pixelColorArray[NUM_PIXELS_MAX+1];
 
 Adafruit_NeoPixel_ZeroDMA pixels(NUM_PIXELS_MAX+1, PIN_NEOPIXEL, NEO_GRB);
 
-void setupPixels(){
+void pixelBegin(){
     pixels.begin();
     pixels.setBrightness(*pixelBrightness);
 }
 
-
-
-void updatePixels(){
+void pixelUpdateConfig(){
   pixels.setBrightness(*pixelBrightness);
+}
+
+void pixelShow(){
   for (int i=1; i<=*numPixels; i++){
     pixels.setPixelColor(i, pixelColorArray[i]); //note that we start with  1, leaving index 0 for internal neopixel
   }
   pixels.show();
 }
 
-void updateIntPixel(uint32_t color){
+void intPixelUpdate(uint32_t color){
   pixels.setPixelColor(0,color);
   pixels.show();
 }

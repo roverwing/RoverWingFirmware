@@ -7,11 +7,13 @@
 #define MOTOR_MODE_POWER 0 //includes brake
 #define MOTOR_MODE_COAST 1
 #define MOTOR_MODE_SPEEDPID 2
+#define MOTOR_MODE_TANKDRIVE 3 //motors a re conrolled by higher level drive controls,
+                           // as defined in drive.h - not individually
 // For coasting a motor:
 // Normally, motor power is an int between -500...500
 // this special value indicates that the motor should be stopped in coast state
 #define POWER_COAST 1000
-#define MOTOR_MAX_POWER 500 
+#define MOTOR_MAX_POWER 500
 
 extern int32_t  prevEncoder[];//to hold previous values of encoders - for computing speed
 

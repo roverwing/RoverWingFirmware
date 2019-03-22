@@ -1,6 +1,16 @@
 #include "Arduino.h"
-#include "Wire.h"
 #define MPU6050_ADDRESS 0x69  // Device address when ADO = 1
+//statuses
+#define IMU_OFF 0x00
+#define IMU_OK  0x01
+#define IMU_CALIBRATING 0x02
+#define IMU_ERROR 0x04
+//configuration mode used in communication with feather
+#define IMU_CONFIG_BEGIN 0x01
+#define IMU_CONFIG_CALIBRATE 0x02
+#define IMU_CONFIG_END 0x00
+
+
 // Set initial input parameters
 #define ASCALE 0x00 //accelereation scale: 0x00 is 2g max
 #define GSCALE 0x00 //gyro scale: 0x00 is 250 deg/s
@@ -65,9 +75,10 @@ const float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // compute zeta, the othe
 //checks if MPU6050 is available
 //assumes Wire1 has already been started
 bool MPU6050isAvailable();
-// configures and calibrates MPU6050
-//retunrs 1 on success, 0 on failure
+// starts  MPU6050
+// returns 1 on success, 0 on failure
 bool MPU6050begin();
+void MPU6050calibrate();
 void readAccelData();
 void readGyroData();
 
@@ -88,5 +99,5 @@ float getPitch();
 float getRoll();
 //print IMU readings to serial monitor, for debugging
 void MPU6050print();
-void MPU6050SelfTest(float * destination);
+
 void _MadgwickQuaternionUpdate(float deltat);

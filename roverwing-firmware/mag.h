@@ -3,9 +3,9 @@
 #include "Arduino.h"
 #include "Wire.h"
 //statuses
-#define MAG_STATUS_OFF 0x00
-#define MAG_STATUS_ON 0x01
-#define MAG_STATUS_CALIBRATING 0x02
+#define MAG_OFF 0x00
+#define MAG_OK  0x01
+#define MAG_CALIBRATING 0x02
 //configuration mode used in communication with feather
 #define MAG_CONFIG_BEGIN 0x01
 #define MAG_CONFIG_CALIBRATE 0x02
@@ -34,14 +34,14 @@
 //constants
 #define DEG_PER_RADIAN (180.0f/PI)
 
-
+extern int16_t magSoftIronMatrix[][3];
 
 boolean magBegin();
 void magEnd();
 void magUpdate();
 void magCalibrate();
-void magApplyUsrOffsets();
-
+void magSetCalData();
+void magResetCalData();
 
 
 #endif

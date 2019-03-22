@@ -10,15 +10,17 @@
 #include "gps.h"
 #include "mag.h"
 #include "neopixel.h"
+#include "drive.h"
 
 
 #define FW_VERSION_MAJOR 0
 #define FW_VERSION_MINOR 95
 //uncomment to allow debugging print to Serial.
-//#define DEBUG_PRINT
+#define DEBUG_PRINT
 
 
 //script own variables
+uint8_t i;
 uint32_t lastPrint=0; //time of last printing, in ms
 uint32_t lastLoop2update=0; //time when we last ran low-priority updates, in us
 uint32_t loop2deltat=1;
@@ -57,14 +59,17 @@ void setup() {
     servoPosition[i] = 1500;
   }
   //
-  *imuStatus = 0x00;
+  *imuStatus = 0x05;
+  *gpsStatus = GPS_OFF;
+  *magStatus = MAG_OFF;
   //neopixels
   *pixelBrightness=(uint8_t)32;
-  setupPixels();
-  updatePixels();
-  //temporary, FIXME
-  //startMPU6050();
-  //*imuStatus=0x01;
+  pixelBegin();
+  pixelShow();
+  //delay(3000);
+  if  (MPU6050isAvailable()) {
+    Serial.println("IMU is available");
+  }
 }
 
 void loop() {
@@ -94,33 +99,41 @@ void loop() {
   }
   if (isSet(FLAG_IMU_CONFIG)){
     clearFlag(FLAG_IMU_CONFIG);
-    //FIXME: user provided offsets!
-    //debug!
-    /*servoPosition[0]=1000;
-    setServos();
-    delay(300);
-    servoPosition[0]=1500;
-    setServos();*/
-    //
-    bool activate = (*imuConfig)&0x01; //get the last bit of the config byte
-    if (activate) {
-      //we just received the command to activate IMU!
-      //let us try actvating it; if we succeed, let us set imuStatus to true.
-      // WARNING: activating IMU takes aabout 1.5 seconds!!!
-      delay(500);
-      MPU6050begin();
-#ifdef DEBUG_PRINT
-      Serial.print("Activating IMU: "); Serial.println(*imuStatus);
-#endif
-    } else {
-      //we received the command to deactivate imu
-      *imuStatus = false;
+    switch (*imuConfig){
+      case IMU_CONFIG_END: //stop
+        *imuStatus = IMU_OFF;
+        break;
+      case IMU_CONFIG_BEGIN://begin
+        *imuStatus = 33;
+        Serial.println("starting IMU");
+        MPU6050begin();
+        Serial.println("IMU Started");
+        //*imuStatus += 7;
+        break;
+      case IMU_CONFIG_CALIBRATE: //calibrate
+        MPU6050calibrate();
+        break;
     }
   }
-  if (isSet(FLAG_MAG_OFFSET)){
-    clearFlag(FLAG_MAG_OFFSET);
-    //user provided offsets for magnetometer; let us use them
-    magApplyUsrOffsets();
+  if (isSet(FLAG_ACCEL_OFFSET)){
+    clearFlag(FLAG_ACCEL_OFFSET);
+    //Serial.println("Applying accelerometer calibration;");
+    for (i=0; i<3; i++){
+      accelOffset[i]=accelUsrOffset[i];
+    }
+  }
+  if (isSet(FLAG_GYRO_OFFSET)){
+    clearFlag(FLAG_GYRO_OFFSET);
+    Serial.println("Applying gyro calibration;");
+    for (i=0; i<3; i++){
+      gyroOffset[i]=gyroUsrOffset[i];
+    }
+  }
+  if (isSet(FLAG_MAG_CALIBRATION)){
+    clearFlag(FLAG_MAG_CALIBRATION);
+    Serial.println("Applying mag calibration;");
+    //user provided offsets and matrix  for magnetometer; let us use them
+    magSetCalData();
   }
   if (isSet(FLAG_MAG_CONFIG)){
     clearFlag(FLAG_MAG_CONFIG);
@@ -143,24 +156,37 @@ void loop() {
   }
   if (isSet(FLAG_PIXEL_CONFIG)) {
     clearFlag(FLAG_PIXEL_CONFIG);
-    //FIXME
-    updatePixels(); //updates brightness, copies pixel colors and then calls pixel.show();
+    pixelUpdateConfig(); //updates brightness
   }
-  //now, update all sensors
-  if ((*imuStatus)) {
-   MPU6050update();
+  if (isSet(FLAG_PIXEL_COMMAND)) {
+    clearFlag(FLAG_PIXEL_COMMAND);
+    if (*pixelCommand){
+      pixelShow(); //pushes changes to hardware
+    }
+  }
+  if (isSet(FLAG_DRIVE_MODE)) {
+    clearFlag(FLAG_DRIVE_MODE);
+    driveSetup();
+  }
+
+
+  /**********************************************
+   * now, update all sensors
+   **********************************************/
+  if ((*imuStatus)==IMU_OK ) {
+    MPU6050update();
   }
   if (*gpsStatus){
     GPSupdate();
   }
-  if (*magStatus==MAG_STATUS_ON) {
+  if (*magStatus==MAG_OK) {
     //magnetometer active
     magUpdate();
   }
   updateSonars();
   updateAnalogs();
-  //low priority loop: updated 20 times/s, i.e. every 50 ms
-  if (micros()- lastLoop2update>50000){
+  //low priority loop: updated 25 times/s, i.e. every 40 ms
+  if (micros()- lastLoop2update>40000){
     loop2Count++;
     loop2deltat=micros()-lastLoop2update;//duration in us
     lastLoop2update = micros();
@@ -175,12 +201,15 @@ void loop() {
       setMotors();
       //Serial.println("Setting PID");
     }
-    if ((*imuStatus)){
+    if ((*imuStatus)==IMU_OK){
       //compute yaw, pitch, roll and write to register
-      *yaw=(int16_t) (getYaw()*100.0f);
-      *pitch=(int16_t) (getPitch()*100.0f);
-      *roll=(int16_t) (getRoll()*100.0f);
+      *yaw=(int16_t) (getYaw()*10.0f);
+      *pitch=(int16_t) (getPitch()*10.0f);
+      *roll=(int16_t) (getRoll()*10.0f);
     }
+    /*if (*driveStatus==DRIVE_STATUS_INPROGRESS){
+      driveUpdateMotors();
+    }*/
     //update internal  neopixel, blinking 2 times a second
     if ((loop2Count%5)==0) {
       //every 5 cycles = 4 times /s
@@ -194,8 +223,8 @@ void loop() {
         intPixelColor = GREEN;
       }
       //change color
-      if (blink) updateIntPixel(intPixelColor);
-      else updateIntPixel(OFF);
+      if (blink) intPixelUpdate(intPixelColor);
+      else intPixelUpdate(OFF);
     }
 
   }
@@ -211,7 +240,11 @@ void loop() {
     loopCount=0;
 
     //print IMU values
-    if ((*imuStatus)){
+    if (MPU6050isAvailable()) {
+      Serial.print("IMU is aavailable. Status is ");
+      Serial.println(*imuStatus);
+    }
+    if ((*imuStatus==IMU_OK)){
       MPU6050print();
     }
     //print encoders

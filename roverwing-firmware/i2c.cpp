@@ -10,7 +10,7 @@ void i2cMasterBegin(int freq){
   Wire1.begin();
   Wire1.setClock(freq);
   pinPeripheral(PIN_WIRE1_SDA,PIO_SERCOM);
-  pinPeripheral(PIN_WIRE1_SDA,PIO_SERCOM);
+  pinPeripheral(PIN_WIRE1_SCL,PIO_SERCOM);
 }
 
 void i2cMasterWriteByte(uint8_t address, uint8_t regAddress, uint8_t data) {
@@ -24,7 +24,7 @@ uint8_t i2cMasterReadByte(uint8_t address, uint8_t regAddress) {
   uint8_t data; // `data` will store the register data
   Wire1.beginTransmission(address);         // Initialize the Tx buffer
   Wire1.write(regAddress);	                 // Put slave register address in Tx buffer
-  Wire1.endTransmission(false);             // Send the Tx buffer, but send a restart to keep connection alive
+  Wire1.endTransmission();             // Send the Tx buffer, but send a restart to keep connection alive
   Wire1.requestFrom(address, (uint8_t) 1);  // Read one byte from slave register address
   data = Wire1.read();                      // Fill Rx buffer with result
   return data;                             // Return data read from slave register
@@ -33,7 +33,7 @@ uint8_t i2cMasterReadByte(uint8_t address, uint8_t regAddress) {
 void i2cMasterReadBytes(uint8_t address, uint8_t regAddress, uint8_t count, uint8_t * dest) {
   Wire1.beginTransmission(address);   // Initialize the Tx buffer
   Wire1.write(regAddress);            // Put slave register address in Tx buffer
-  Wire1.endTransmission(false);       // Send the Tx buffer, but send a restart to keep connection alive
+  Wire1.endTransmission();       // Send the Tx buffer, but send a restart to keep connection alive
   uint8_t i = 0;
   Wire1.requestFrom(address, count);  // Read bytes from slave register address
   while (Wire1.available()) {
