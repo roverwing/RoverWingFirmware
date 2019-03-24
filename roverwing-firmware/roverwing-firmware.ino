@@ -13,10 +13,10 @@
 #include "drive.h"
 
 
-#define FW_VERSION_MAJOR 0
-#define FW_VERSION_MINOR 95
+#define FW_VERSION_MAJOR 1
+#define FW_VERSION_MINOR 0
 //uncomment to allow debugging print to Serial.
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 
 //script own variables
@@ -185,6 +185,7 @@ void loop() {
   }
   updateSonars();
   updateAnalogs();
+
   //low priority loop: updated 25 times/s, i.e. every 40 ms
   if (micros()- lastLoop2update>40000){
     loop2Count++;
@@ -207,9 +208,9 @@ void loop() {
       *pitch=(int16_t) (getPitch()*10.0f);
       *roll=(int16_t) (getRoll()*10.0f);
     }
-    /*if (*driveStatus==DRIVE_STATUS_INPROGRESS){
+    if (*driveStatus==DRIVE_STATUS_INPROGRESS){
       driveUpdateMotors();
-    }*/
+    }
     //update internal  neopixel, blinking 2 times a second
     if ((loop2Count%5)==0) {
       //every 5 cycles = 4 times /s

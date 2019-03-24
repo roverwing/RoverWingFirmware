@@ -40,7 +40,7 @@ void initRegmap(){
   registerFlag[REGB_PIXEL_COMMAND] = FLAG_PIXEL_COMMAND;
   registerFlag[REGB_DRIVE_MODE] = FLAG_DRIVE_MODE;
   for (i=0; i<26; i++) registerFlag[REGB_DRIVE_MOTORCONFIG] = FLAG_DRIVE_CONFIG;
-  for (i=0; i<8; i++) registerFlag[REGB_DRIVE_DISTANCE] = FLAG_DRIVE_TARGET;
+  for (i=0; i<10; i++) registerFlag[REGB_DRIVE_DISTANCE] = FLAG_DRIVE_TARGET;
 }
 
 
@@ -91,6 +91,7 @@ volatile int32_t  * gpsLat            = (int32_t *) &REGA[REGA_GPS_LAT];
 volatile int32_t  * gpsLong           = (int32_t *) &REGA[REGA_GPS_LONG];
 volatile uint32_t * gpsTimestamp      = (uint32_t *) &REGA[REGA_GPS_TIMESTAMP];
 volatile uint8_t  * driveStatus       = (uint8_t *) &REGA[REGA_DRIVE_STATUS];
+volatile int16_t  * debug             = (int16_t *) &REGA[REGA_DEBUG];
 
 //////////////////////////////
 // Pointers to register B
@@ -136,3 +137,4 @@ volatile float    * drivePIDcoef  = (float *) &REGB[REGB_DRIVE_PID_COEF];
 volatile int32_t  * driveDistance = (int32_t *) &REGB[REGB_DRIVE_DISTANCE];
 volatile int16_t  * driveTurnAngle= (int16_t *) &REGB[REGB_DRIVE_TURNANGLE];
 volatile int16_t  * driveTargetPower= (int16_t *) &REGB[REGB_DRIVE_TARGETPOWER];
+volatile uint16_t * driveRampTime = (uint16_t *) &REGB[REGB_DRIVE_RAMPTIME];

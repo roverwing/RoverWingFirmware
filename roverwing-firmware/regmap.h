@@ -78,7 +78,12 @@ Bytes  Offset name     value               data type  description
 128-131 REGA_GPS_LONG  gpsLong             int32  longitude
 132-135 REGA_GPS_TIMESTAMP gpsTimestamp    uint32 timestamp of last measurement, in ms
 ------ DRIVE
-136    REGA_DRIVE_STATUS
+136    REGA_DRIVE_STATUS                   byte
+137    unused
+------ DEBUG
+138-139 REGA_DEBUG        debug[0]         int16  for debugging purposes
+140-141                   debug[1]
+142-143                   debug[2]
 */
 #define REGA_FW_VERSION    0
 #define REGA_ANALOG_RAW    2
@@ -105,7 +110,7 @@ Bytes  Offset name     value               data type  description
 #define REGA_GPS_LONG      128
 #define REGA_GPS_TIMESTAMP 132
 #define REGA_DRIVE_STATUS  136
-
+#define REGA_DEBUG         138
 
 /*
    REGISTER B - writable
@@ -192,7 +197,7 @@ Bytes  Offset name     value               data type  description
 140-143 REGB_DRIVE_DISTANCE    driveDistance      int32   distance to drive, in encoder ticks. Always positive, even when going backwards
 144-145 REGB_DRIVE_TURNANGLE   driveTurnAngle     int16   angle to turn, in units of 0.1 degree. Positive is clockwise
 146-147 REGB_DRIVE_TARGETPOWER driveTargetPower   int16   requested  power, -500...500. For driving backwards must be negative
-
+148-149 REGB_DRIVE_RAMPTIME    driveRampTime      uint16  time for ramping speed from 0 to full, in ms
 
 */
 #define REGB_ANALOG_BITMASK    0
@@ -227,6 +232,7 @@ Bytes  Offset name     value               data type  description
 #define REGB_DRIVE_DISTANCE    140
 #define REGB_DRIVE_TURNANGLE   144
 #define REGB_DRIVE_TARGETPOWER 146
+#define REGB_DRIVE_RAMPTIME    148
 
 // now, pointer/aliases - for direct access to registers. These are forward declarations,
 //the definitions are in regmap.cpp
@@ -272,7 +278,7 @@ extern volatile int32_t * gpsLong;
 extern volatile uint32_t * gpsTimestamp;
 //DRIVE
 extern volatile uint8_t * driveStatus;
-
+extern volatile int16_t * debug;
 //////////////////////////////
 // Pointers to register B
 /////////////////////////////
@@ -317,6 +323,7 @@ extern volatile float    * drivePIDcoef;
 extern volatile int32_t  * driveDistance;
 extern volatile int16_t  * driveTurnAngle;
 extern volatile int16_t  * driveTargetPower;
+extern volatile uint16_t * driveRampTime;
 
 
 
