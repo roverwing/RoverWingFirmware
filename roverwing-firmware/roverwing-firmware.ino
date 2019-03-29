@@ -16,7 +16,7 @@
 #define FW_VERSION_MAJOR 1
 #define FW_VERSION_MINOR 0
 //uncomment to allow debugging print to Serial.
-//#define DEBUG_PRINT
+#define DEBUG_PRINT
 
 
 //script own variables
@@ -53,7 +53,7 @@ void setup() {
   *whoAmI=SLAVE_ADDRESS;
   *lowVoltage=0; //set low voltage threshold to 0, effectively disabling low voltage warnings
   *sonarBitmask = 0x00; // sonars inactive
-  *analogBitmask = 0x00; //analog inputs are inactive
+  *analogBitmask = 0xFF; //analog inputs are active
   //initialize servo positions
   for (int i=0; i<4; i++){
     servoPosition[i] = 1500;
@@ -65,6 +65,7 @@ void setup() {
   //neopixels
   *pixelBrightness=(uint8_t)32;
   pixelBegin();
+  intPixelUpdate(BLUE);
   pixelShow();
   //delay(3000);
   if  (MPU6050isAvailable()) {
@@ -217,6 +218,7 @@ void loop() {
       blink =!blink;
       //compute voltage
       voltage = (float) analogAvg[0]*0.1*voltageScale;
+      //Serial.print("Voltage: "); Serial.println(voltage);
       //check voltage limit
       if (voltage<(*lowVoltage)*0.1f) {
         intPixelColor = YELLOW;

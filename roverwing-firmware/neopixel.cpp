@@ -6,6 +6,7 @@ Adafruit_NeoPixel_ZeroDMA pixels(NUM_PIXELS_MAX+1, PIN_NEOPIXEL, NEO_GRB);
 
 void pixelBegin(){
     pixels.begin();
+    *numPixels=3;
     pixels.setBrightness(*pixelBrightness);
 }
 
