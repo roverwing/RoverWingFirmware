@@ -13,8 +13,10 @@
 
 // Set initial input parameters
 #define ASCALE 0x00 //accelereation scale: 0x00 is 2g max
-#define GSCALE 0x00 //gyro scale: 0x00 is 250 deg/s
-const float gRes = 250.0f / 32768.0f; //gyro resolution, in (deg/s)/LSB
+//#define GSCALE 0x00 //gyro scale: 0x00 is 250 deg/s
+//const float gRes = 250.0f / 32768.0f; //gyro resolution, in (deg/s)/LSB
+#define GSCALE 0x01 //gyro scale: 0x01 is 500 deg/s
+const float gRes = 500.0f / 32768.0f; //gyro resolution, in (deg/s)/LSB
 const float gResRad = gRes * PI/180.0f; //gyro resolution, in (rad/s)/LSB
 const float aRes = 2.0f/32768.0f;    //accel resolution, in g/LSB
 const float radToDeg=180.0f/PI;      //converstion factor from radians to degrees s

@@ -11,7 +11,6 @@ int8_t motorDir[2]; // +1 means that positivie power to that motor causes rover 
 int8_t motorTurnDir[2]; //+1 means that positive power to that motor causes rover to rotate clockwise
 
 int16_t driveCurPower; // current power to motors
-int16_t driveTargetYaw; //target yaw angle, in units of 0.1 deg
 int32_t driveTargetPosition;
 int8_t turnDir; //+1 for cw, -1 for ccw
 int8_t driveDir; //+1 for forward, -1 for backwards
@@ -34,7 +33,7 @@ float distanceUnit; //how many encoder ticks rover travels in 1 sec at power=1 (
 // uint16_t * driveMinPower;
 // float    * drivePIDcoef;
 // int32_t  * driveDistance;
-// int16_t  * driveTurnAngle;
+// int16_t  * driveHeading; //target yaw angle, in units of 0.1 deg
 // int16_t  * driveTargetPower;
 // uint16_t * driveRampTime;
 
@@ -50,7 +49,7 @@ void driveSetup(){
   motorMode[1]=MOTOR_MODE_TANKDRIVE;
   *driveStatus=DRIVE_STATUS_INPROGRESS;
   driveStartTime=millis();
-  int16_t curYaw=getYaw()*10.0f; // current rover direction, in units of 0.1 degree
+  //int16_t curYaw=getYaw()*10.0f; // current rover direction, in units of 0.1 degree
   //now, determine all motor directions
   if (*driveMotorConfig & B00000001) motorDir[0]=-1;
   else motorDir[0]=1;
@@ -71,7 +70,7 @@ void driveSetup(){
   //now, do everything else
   switch (*driveMode){
     case DRIVE_STRAIGHT:
-      driveTargetYaw=curYaw; //direction to hold
+      //driveHeading=curYaw; //direction to hold
       if (*driveTargetPower>0) driveDir=+1;
       else driveDir=-1;
       //initialize pid
@@ -80,7 +79,7 @@ void driveSetup(){
       drivePID.setTarget(0.0f);
       break;
     case DRIVE_STRAIGHT_DISTANCE:
-      driveTargetYaw=curYaw; //direction to hold
+      //driveHeading=curYaw; //direction to hold
       if (*driveTargetPower>0) driveDir=+1;
       else driveDir=-1;
       //target position, as halfsum of two positions (with signs as necessary)
@@ -91,8 +90,8 @@ void driveSetup(){
       drivePID.setTarget(0.0f);
       break;
     case DRIVE_TURN:
-      driveTargetYaw=normalizeAngle(curYaw + *driveTurnAngle);
-      if (*driveTurnAngle>0) turnDir=+1;
+      int16_t turnAngle=normalizeAngle(*driveHeading-*yaw);
+      if (turnAngle>0) turnDir=+1;
       else turnDir=-1;
       break;
   }
@@ -138,7 +137,7 @@ void driveUpdateMotors(){
       power1=power*motorDir[0];
       power2=power*motorDir[1];
       //now, compute and apply the course correction
-      dYaw=normalizeAngle(driveTargetYaw-*yaw );
+      dYaw=normalizeAngle(*driveHeading-*yaw );
       correction=-(int16_t)(drivePID.update(0.1f*dYaw) * MOTOR_MAX_POWER);//positive correction means we need to turn cw
       //correction=(int16_t)(0.3f*dYaw); //dYaw=900=90 deg will give correction of 300, or 60%
       power1+=correction*motorTurnDir[0];
@@ -146,9 +145,9 @@ void driveUpdateMotors(){
         //FIXME
       break;
     case DRIVE_TURN:
-      dYaw=turnDir*normalizeAngle(driveTargetYaw-*yaw); //should be positive
-      if (dYaw<10) {
-        //less than 1 degree to turn, time to stop
+      dYaw=turnDir*normalizeAngle(*driveHeading-*yaw); //should be positive
+      if (dYaw<30) {
+        //less than 3 degree to turn, time to stop
         *driveStatus=DRIVE_STATUS_COMPLETE;
         *driveMode=DRIVE_OFF;
         setMotorsPower(0,0);

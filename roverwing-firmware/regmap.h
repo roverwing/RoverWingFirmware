@@ -195,7 +195,7 @@ Bytes  Offset name     value               data type  description
 124-139 REGB_DRIVE_PID_COEF    drivePIDcoef       float[4] PID coefficients for driving straight using IMU
 ------ TANK DRIVE TARGETS
 140-143 REGB_DRIVE_DISTANCE    driveDistance      int32   distance to drive, in encoder ticks. Always positive, even when going backwards
-144-145 REGB_DRIVE_TURNANGLE   driveTurnAngle     int16   angle to turn, in units of 0.1 degree. Positive is clockwise
+144-145 REGB_DRIVE_HEADING     driveHeading       int16   target value of heading (as yaw angle), in units of 0.1 deg. Must be between -1800 and 1800
 146-147 REGB_DRIVE_TARGETPOWER driveTargetPower   int16   requested  power, -500...500. For driving backwards must be negative
 148-149 REGB_DRIVE_RAMPTIME    driveRampTime      uint16  time for ramping speed from 0 to full, in ms
 
@@ -230,7 +230,7 @@ Bytes  Offset name     value               data type  description
 #define REGB_DRIVE_MINPOWER    120
 #define REGB_DRIVE_PID_COEF    124
 #define REGB_DRIVE_DISTANCE    140
-#define REGB_DRIVE_TURNANGLE   144
+#define REGB_DRIVE_HEADING     144
 #define REGB_DRIVE_TARGETPOWER 146
 #define REGB_DRIVE_RAMPTIME    148
 
@@ -321,7 +321,7 @@ extern volatile uint16_t * driveMaxTurnSpeed;
 extern volatile uint16_t * driveMinPower;
 extern volatile float    * drivePIDcoef;
 extern volatile int32_t  * driveDistance;
-extern volatile int16_t  * driveTurnAngle;
+extern volatile int16_t  * driveHeading;
 extern volatile int16_t  * driveTargetPower;
 extern volatile uint16_t * driveRampTime;
 

@@ -14,7 +14,7 @@
 
 
 #define FW_VERSION_MAJOR 1
-#define FW_VERSION_MINOR 0
+#define FW_VERSION_MINOR 2
 //uncomment to allow debugging print to Serial.
 #define DEBUG_PRINT
 

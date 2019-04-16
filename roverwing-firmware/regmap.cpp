@@ -135,6 +135,6 @@ volatile uint16_t * driveMaxTurnSpeed = (uint16_t *) &REGB[REGB_DRIVE_MAXTURNSPE
 volatile uint16_t * driveMinPower = (uint16_t *) &REGB[REGB_DRIVE_MINPOWER];
 volatile float    * drivePIDcoef  = (float *) &REGB[REGB_DRIVE_PID_COEF];
 volatile int32_t  * driveDistance = (int32_t *) &REGB[REGB_DRIVE_DISTANCE];
-volatile int16_t  * driveTurnAngle= (int16_t *) &REGB[REGB_DRIVE_TURNANGLE];
+volatile int16_t  * driveHeading  = (int16_t *) &REGB[REGB_DRIVE_HEADING];
 volatile int16_t  * driveTargetPower= (int16_t *) &REGB[REGB_DRIVE_TARGETPOWER];
 volatile uint16_t * driveRampTime = (uint16_t *) &REGB[REGB_DRIVE_RAMPTIME];

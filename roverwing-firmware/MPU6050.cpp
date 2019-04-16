@@ -93,11 +93,11 @@ void MPU6050calibrate(){
   // Configure MPU6050 gyro and accelerometer for bias calculation
   i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_CONFIG, 0x01);      // Set low-pass filter to 188 Hz
   i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_SMPLRT_DIV, 0x00);  // Set sample rate to 1 kHz
-  i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_GYRO_CONFIG, 0x00);  // Set gyro full-scale to 250 degrees per second, maximum sensitivity
-  i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_ACCEL_CONFIG, 0x00); // Set accelerometer full-scale to 2 g, maximum sensitivity
+  i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_GYRO_CONFIG, GSCALE<<3);  // Set gyro sensitivity
+  i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_ACCEL_CONFIG, ASCALE<<3); // Set accelerometer full-scale to 2 g, maximum sensitivity
 
-  uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
-  uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
+  uint16_t  gyrosensitivity  = 1.0/gRes;   // = 131 LSB/degrees/sec
+  uint16_t  accelsensitivity = 1.0/aRes;  // = 16384 LSB/g
 
   // Configure FIFO to capture accelerometer and gyro data for bias calculation
   i2cMasterWriteByte(MPU6050_ADDRESS, MPU6050_REG_USER_CTRL, 0x40);   // Enable FIFO
