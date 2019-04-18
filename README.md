@@ -15,13 +15,11 @@ Pre-built firmware binaries are contained in folder `binaries`. To install a new
 1. Download the prebuilt firmware binary to your computer. The file must should have extension .uf2, indicating that it can be used with UF2 bootloader (which is what we use on RoverWing). You can find more info abut the UF2 bootloader in [this guide from Adafruit](https://learn.adafruit.com/adafruit-feather-m0-express-designed-for-circuit-python-circuitpython/uf2-bootloader-details). 
 2. Connect your RoverWing board to a computer using microUSB cable. You can use Windows (Windows 10 recommended), Mac, or Linux computer. If you are using WIndows 7 or earlier, you might need to install additional drivers; see the Adafruit guide referenced above for details. 
 3. Power your RoverWing board by connecting a 7-14V power source. (RoverWing can not be powered via USB cable.)
-4. Double-click reset button on the RoverWing. This should put  RoverWing board in bootloader mode, and it will appear as a new removable drive on your computer, with the name **HALLOWBOOT**. If you open this drive, you will see that it contains 3 files, CURRENT.UF2, INDEX.HTM, and INFO_UF2.TXT. The file CURRENT.UF2 is the current firmware. 
+4. Double-click reset button on the RoverWing. This should put  RoverWing board in bootloader mode, and it will appear as a new removable drive on your computer, with the name **ROVERWING**. If you open this drive, you will see that it contains three files, CURRENT.UF2, INDEX.HTM, and INFO_UF2.TXT. The file CURRENT.UF2 is the current firmware. 
 
-**FIXME**: we really need to modify the bootloader, so that it doesn't use HALLOWBOOT but instead displays ROVERBOOT or something similar. 
+5. Drag the firmware .uf2 file you had downloaded into the ROVERWING folder. You might get a warning from the OS that the file is copied without its properties; just click "YES".
 
-5. Drag the firmware .uf2 file you had downloaded into the HALLOWBOOT folder. You might get a warning form the OS that the file is copied without its properties; just click "YES".
-
-After the file is copied, the RoverWing should restart automatically, the HALLOWBOOT drive disappears from your computer screen, and your RoverWing is ready for use!
+After the file is copied, the RoverWing should restart automatically, the ROVERWING drive disappears from your computer screen, and your RoverWing is ready for use!
 
 
 ## Building the firmware from source
