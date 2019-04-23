@@ -25,7 +25,38 @@ After the file is copied, the RoverWing should restart automatically, the ROVERW
 ## Building the firmware from source
 This information is for advanced users only. Use at your own risk!!
 
-To build the firmware from the source, you need to have Arduino IDE installed on your computer (version 1.8 or later). You also need to install the the board definition files. The easiest way to do it is to reuse the board definitions provided by Adafruit for their Crickit board, just changing some files, as follows:
+It is assumed that you have some experience with Arduino, so the instructions are brief. This is intentional, to discourage inexperienced users. 
+
+To build the firmware from the source, you need the following software installed on your computer:
+1.  Arduino IDE (version 1.8 or later). 
+
+2. Board definition files -- see instructions below
+
+3. Required libraries: 
+
+   1. NeoGPS
+   2. Adafruit_NeoPixel
+   3. Adafruit_Zero_DMA_Library
+   4. Adafruit_DMA_neopixel_library
+   
+   All of these libraries can be installed using library manager built into Arduino IDE
+   
+4. After installing these libraries, you need to modify the the file Adafruit_NeoPixel_ZeroDMA.cpp in Adafruit_DMA_neopixel_library, adding the following lines: 
+```C
+#elif defined(ADAFRUIT_CRICKIT_M0)
+  &sercom0, SERCOM0, SERCOM0_DMAC_ID_TX,   33,   10,  34, SPI_PAD_2_SCK_3, SERCOM_RX_PAD_1, PIO_SERCOM,
+```
+immediately before the line
+```C
+#elif defined(__SAMD51__) // Metro M4
+```
+
+5. After completing the steps above,  restart the Arduino IDE and select `Adafruti Crickit M0` in *Tools->Board* menu. 
+
+You are now ready to build and upload new firmware from source. Download the `src` folder from this repository as a zip file, unpack, rename the folder to `roverwing-firmware`, and move it to Arduino sketchbook folder. Now find in that folder file  `roverwing-firmware.ino` and open it in Arduino IDE. Edit is as you like and upload to the board in the usual way. 
+
+### Board definition files
+For step 2 above, you need to install the board definition files for the RoverWing board.  The easiest way to do it is to reuse the board definitions provided by Adafruit for their Crickit board, just changing some files, as follows:
 
 1. Install Adafruit's board support package for SAMD-based boards, as described [here](https://learn.adafruit.com/adafruit-feather-m0-basic-proto/setup). Please use version 1.2.9, **even if later versions are available** (most likely, using later versions would also be OK, but it was not tested.)
 
@@ -35,10 +66,8 @@ To build the firmware from the source, you need to have Arduino IDE installed on
 
 3. Download two files `variant.cpp` and `variant.h` from `boardDefinitions` folder this repository and use them to replace the corresponding files in `crickit_m0` folder. 
 
-4. Restart the Arduino IDE and select `Adafruti Crickit M0` in *Tools->Board* menu. 
 
-You are now ready to build and upload new firmware from source. Download the `src` folder from this repository as a zip file, unpack, rename the folder to `roverwing-firmware`, and move it to Arduino sketchbook folder. Now find in that folder file  `roverwing-firmware.ino` and open it in Arduino IDE. Edit is as you like and upload to the board in the usual way. 
-
-
+## License
+RoverWing firmware is distributed under the terms of GNU General Public License version 3.0. Full text of the license is given in the LICENSE file in this repository.
 
 
