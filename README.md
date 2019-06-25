@@ -1,7 +1,7 @@
 # RoverWing Firmware
 
 This repository contains the firmware (both source and pre-built binaries) and necessary support files for the RoverWing board. 
-For more info about RoverWing, please visit Roverwing main website: ????
+For more info about RoverWing, please visit [Roverwing main website:](github pages)
 
 Since RoverWing comes with the firmware pre-installed, most users do not need any of the files in this repository. 
 You only need to use it if you want to understand the inner workings of the firmware, or to create your own modified 
