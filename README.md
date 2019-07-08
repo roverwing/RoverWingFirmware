@@ -66,6 +66,12 @@ For step 2 above, you need to install the board definition files for the RoverWi
 
 3. Download two files `variant.cpp` and `variant.h` from `boardDefinitions` folder this repository and use them to replace the corresponding files in `crickit_m0` folder. 
 
+[Roverwing Homepage](https://roverwing.github.io/RoverWing/)
+
+[Hardware Details](https://roverwing.github.io/RoverWingHardware/)  
+
+[User Library](https://roverwing.github.io/RoverWingLibrary/)
+
 
 ## License
 RoverWing firmware is distributed under the terms of GNU General Public License version 3.0. Full text of the license is given in the LICENSE file in this repository.
