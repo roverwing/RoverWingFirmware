@@ -80,11 +80,15 @@ void readGyroData() {
 }
 
 void ICM42605calibrate(){
-  uint16_t ii;
+  uint8_t ii;
   int32_t gyro_bias[3] = {0, 0, 0}, accel_bias[3] = {0, 0, 0};
   *imuStatus = IMU_CALIBRATING;
-
-  for (int ii = 0; ii < 128; ii++) {
+  //zero the offsets
+  for (ii=0; ii<3;ii++){
+      accelOffset[ii]=0;
+      gyroOffset[ii]=0;
+  }
+  for (ii = 0; ii < 256; ii++) {
     readAccelData();
     accel_bias[0] += accel[0];
     accel_bias[1] += accel[1];
@@ -95,12 +99,12 @@ void ICM42605calibrate(){
     gyro_bias[2] += gyro[2];
     delay(50);
   }
-  accel_bias[0] /= 128; // Normalize sums to get average count biases
-  accel_bias[1] /= 128;
-  accel_bias[2] /= 128;
-  gyro_bias[0] /= 128;
-  gyro_bias[1] /= 128;
-  gyro_bias[2] /= 128;
+  accel_bias[0] /= 256; // Normalize sums to get average count biases
+  accel_bias[1] /= 256;
+  accel_bias[2] /= 256;
+  gyro_bias[0] /= 256;
+  gyro_bias[1] /= 256;
+  gyro_bias[2] /= 256;
 
   //remove gravity
   if (accel_bias[0] > G/2)  {
