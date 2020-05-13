@@ -12,7 +12,7 @@
 #define MAG_CONFIG_END 0x00
 
 
-#define MAG_ADDRESS  (0x3C >> 1)         // 0011110x
+#define MAG_ADDRESS  (0x3C >> 1)         // 7 bit addr4ess: 0011110
 #define MAG_MEASUREMENT_CONFIG (B01110100)   // to be placed to config register A
                                              //8 samples per output, 30 Hz refresh rate, normal measurement config
 #define MAG_GAIN      0x20  // corresponds to range of  +/- 1.3 Gauss

@@ -6,7 +6,7 @@
 #include "sonars.h"
 #include "analog.h"
 #include "i2c.h"
-#include "MPU6050.h"
+#include "ICM42605.h"
 #include "gps.h"
 #include "mag.h"
 #include "neopixel.h"
@@ -14,7 +14,7 @@
 
 
 #define FW_VERSION_MAJOR 1
-#define FW_VERSION_MINOR 2
+#define FW_VERSION_MINOR 6
 //uncomment to allow debugging print to Serial.
 #define DEBUG_PRINT
 
@@ -68,7 +68,7 @@ void setup() {
   intPixelUpdate(BLUE);
   pixelShow();
   //delay(3000);
-  if  (MPU6050isAvailable()) {
+  if  (ICM42605isAvailable()) {
     Serial.println("IMU is available");
   }
 }
@@ -79,65 +79,87 @@ void loop() {
   //First, update configuration/motors/servos
   if (isSet(FLAG_SERVO)){
     clearFlag(FLAG_SERVO);//unset the servo flag bit
-    //Serial.print("setting servo to new positions: ");
-    //Serial.print(servoPosition[0]); Serial.println(" ");
+#ifdef DEBUG_PRINT
+    Serial.print("setting servo to new positions: ");
+    Serial.print(servoPosition[0]); Serial.println(" ");
+#endif
     setServos();
   }
   if (isSet(FLAG_ENC_RESET)) {
     clearFlag(FLAG_ENC_RESET);
+#ifdef DEBUG_PRINT
+    Serial.println("Resetting encoder(s)");
+#endif
     resetEncoders();
   }
   if (isSet(FLAG_MOTOR_PID)){
+#ifdef DEBUG_PRINT
+  Serial.println("Updating motor PID  configuration");
+#endif
     updateMotorsConfig();
-    Serial.println("Updating motor PID  configuration");
-    //Serial.print("Motor1 mode: "); Serial.println(motorMode[0] );
-    //Serial.print("Motor2 mode: "); Serial.println(motorMode[1] );
   }
   if (isSet(FLAG_MOTOR_MODE)||isSet(FLAG_MOTOR_POWER)){
     clearFlag(FLAG_MOTOR_MODE);
     clearFlag(FLAG_MOTOR_POWER);
+#ifdef DEBUG_PRINT
+    Serial.println("Updating motor mode/power  configuration");
+    Serial.print("Motor1 mode: "); Serial.println(motorMode[0] );
+    Serial.print("Motor2 mode: "); Serial.println(motorMode[1] );
+#endif
     setMotors();
   }
   if (isSet(FLAG_IMU_CONFIG)){
     clearFlag(FLAG_IMU_CONFIG);
-    switch (*imuConfig){
-      case IMU_CONFIG_END: //stop
-        *imuStatus = IMU_OFF;
-        break;
-      case IMU_CONFIG_BEGIN://begin
-        *imuStatus = 33;
-        Serial.println("starting IMU");
-        MPU6050begin();
-        Serial.println("IMU Started");
-        //*imuStatus += 7;
-        break;
-      case IMU_CONFIG_CALIBRATE: //calibrate
-        MPU6050calibrate();
-        break;
-    }
+#ifdef DEBUG_PRINT
+  Serial.println("Configuring IMU");
+#endif
+  switch (*imuConfig){
+  case IMU_CONFIG_END: //stop
+    *imuStatus = IMU_OFF;
+    break;
+  case IMU_CONFIG_BEGIN://begin
+    *imuStatus = 33; //FIXME
+    Serial.println("starting IMU");
+    ICM42605begin();
+    Serial.println("IMU Started");
+    //*imuStatus += 7;
+    break;
+  case IMU_CONFIG_CALIBRATE: //calibrate
+    ICM42605calibrate();
+    break;
+}
   }
   if (isSet(FLAG_ACCEL_OFFSET)){
     clearFlag(FLAG_ACCEL_OFFSET);
-    //Serial.println("Applying accelerometer calibration;");
+#ifdef DEBUG_PRINT
+  Serial.println("Applying accelerometer calibration;");
+#endif
     for (i=0; i<3; i++){
       accelOffset[i]=accelUsrOffset[i];
     }
   }
   if (isSet(FLAG_GYRO_OFFSET)){
     clearFlag(FLAG_GYRO_OFFSET);
+#ifdef DEBUG_PRINT
     Serial.println("Applying gyro calibration;");
+#endif
     for (i=0; i<3; i++){
       gyroOffset[i]=gyroUsrOffset[i];
     }
   }
   if (isSet(FLAG_MAG_CALIBRATION)){
     clearFlag(FLAG_MAG_CALIBRATION);
+#ifdef DEBUG_PRINT
     Serial.println("Applying mag calibration;");
+#endif
     //user provided offsets and matrix  for magnetometer; let us use them
     magSetCalData();
   }
   if (isSet(FLAG_MAG_CONFIG)){
     clearFlag(FLAG_MAG_CONFIG);
+#ifdef DEBUG_PRINT
+    Serial.println("Configuring magentometer");
+#endif
     switch (*magConfig){
       case MAG_CONFIG_END: //stop
         magEnd();
@@ -152,21 +174,33 @@ void loop() {
   }
   if (isSet(FLAG_GPS_CONFIG)){
     clearFlag(FLAG_GPS_CONFIG);
+#ifdef DEBUG_PRINT
+    Serial.println("Configuring GPS");
+#endif
     if (*gpsConfig) GPSbegin();
     else GPSend();
   }
   if (isSet(FLAG_PIXEL_CONFIG)) {
     clearFlag(FLAG_PIXEL_CONFIG);
+#ifdef DEBUG_PRINT
+    Serial.println("Setting Neopixel brightness");
+#endif
     pixelUpdateConfig(); //updates brightness
   }
   if (isSet(FLAG_PIXEL_COMMAND)) {
     clearFlag(FLAG_PIXEL_COMMAND);
+#ifdef DEBUG_PRINT
+    Serial.println("Showing Neopixels");
+#endif
     if (*pixelCommand){
       pixelShow(); //pushes changes to hardware
     }
   }
   if (isSet(FLAG_DRIVE_MODE)) {
     clearFlag(FLAG_DRIVE_MODE);
+#ifdef DEBUG_PRINT
+    Serial.println("Setting drive mode");
+#endif
     driveSetup();
   }
 
@@ -175,16 +209,24 @@ void loop() {
    * now, update all sensors
    **********************************************/
   if ((*imuStatus)==IMU_OK ) {
-    MPU6050update();
+#ifdef DEBUG_PRINT
+    Serial.println("Updating IMU");
+#endif
+    ICM42605update();
   }
   if (*gpsStatus){
-    GPSupdate();
+#ifdef DEBUG_PRINT
+    Serial.println("Updating GPS");
+#endif
+      GPSupdate();
   }
   if (*magStatus==MAG_OK) {
-    //magnetometer active
+#ifdef DEBUG_PRINT
+    Serial.println("Updating magnetometer");
+#endif
+       //magnetometer active
     magUpdate();
   }
-  updateSonars();
   updateAnalogs();
 
   //low priority loop: updated 25 times/s, i.e. every 40 ms
@@ -192,18 +234,32 @@ void loop() {
     loop2Count++;
     loop2deltat=micros()-lastLoop2update;//duration in us
     lastLoop2update = micros();
-    //Serial.print("last Loop 2 update, us: "); Serial.println(lastLoop2update);
-    //compute  measured motor speed  using encoders
+#ifdef DEBUG_PRINT
+    Serial.print("Loop 2: count "); Serial.print(loop2Count);
+    Serial.print("time since last update (us): "); Serial.println(loop2deltat);
+    Serial.println("Updatign sonars");
+#endif
+    updateSonars();
+#ifdef DEBUG_PRINT
+    Serial.println("Sonars updated");
+#endif    //compute  measured motor speed  using encoders
+    float freq = 1000000.0f/loop2deltat; //frequency of loop2
     for (uint8_t i = 0; i<2; i++){
-      speed[i] = (float)(encoder[i]-prevEncoder[i])*(1000000.0f/loop2deltat);
+      speed[i] = (int16_t) ( (encoder[i]-prevEncoder[i])*freq ); //speed in enc ticks/s
       prevEncoder[i]=encoder[i];
     }
     //if using PID for motors, update motor power
     if ((motorMode[0] == MOTOR_MODE_SPEEDPID) ||(motorMode[1] == MOTOR_MODE_SPEEDPID) ){
+#ifdef DEBUG_PRINT
+     Serial.println("Updatign motors using PID");
+#endif
       setMotors();
       //Serial.println("Setting PID");
     }
     if ((*imuStatus)==IMU_OK){
+#ifdef DEBUG_PRINT
+     Serial.println("Getting Yaw, pitch, and roll");
+#endif
       //compute yaw, pitch, roll and write to register
       *yaw=(int16_t) (getYaw()*10.0f);
       *pitch=(int16_t) (getPitch()*10.0f);
@@ -221,7 +277,7 @@ void loop() {
       //Serial.print("Voltage: "); Serial.println(voltage);
       //check voltage limit
       if (voltage<(*lowVoltage)*0.1f) {
-        intPixelColor = YELLOW;
+        intPixelColor = RED;
       } else {
         intPixelColor = GREEN;
       }
@@ -243,12 +299,12 @@ void loop() {
     loopCount=0;
 
     //print IMU values
-    if (MPU6050isAvailable()) {
+    if (ICM42605isAvailable()) {
       Serial.print("IMU is aavailable. Status is ");
       Serial.println(*imuStatus);
     }
     if ((*imuStatus==IMU_OK)){
-      MPU6050print();
+     ICM42605print();
     }
     //print encoders
     Serial.print("Encoders: "); Serial.print(encoder[0]); Serial.print("    "); Serial.println(encoder[1]);

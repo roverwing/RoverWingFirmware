@@ -2,7 +2,7 @@
 #include "regmap.h"
 #include "motors.h"
 #include "pid.h"
-#include "MPU6050.h"
+#include "ICM42605.h"
 
 //PID controller used for driving in straight line
 PIDcontroller drivePID;

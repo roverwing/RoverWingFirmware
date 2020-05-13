@@ -10,7 +10,7 @@ volatile uint8_t status =0 ; /* 0: ping completed 1: ping initiated
 uint8_t PINS_SONAR_ECHO[]={PIN_SONAR1_ECHO,PIN_SONAR2_ECHO, PIN_SONAR3_ECHO};
 uint8_t PINS_SONAR_TRIG[]={PIN_SONAR1_TRIG,PIN_SONAR2_TRIG, PIN_SONAR3_TRIG};
 
-
+#define SONAR_DEBUG
 
 
 void setupSonarPins(){
@@ -22,9 +22,9 @@ void setupSonarPins(){
     numTimeouts[i]=0;
   }
   *sonarTimeout = 20000; //20 000 us is about 3m 43 cm max distance
-  attachInterrupt(digitalPinToInterrupt(PIN_SONAR1_ECHO), ISR_sonar1, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_SONAR2_ECHO), ISR_sonar2, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(PIN_SONAR3_ECHO), ISR_sonar3, CHANGE);
+  attachInterrupt(PIN_SONAR1_ECHO, ISR_sonar1, CHANGE);
+  attachInterrupt(PIN_SONAR2_ECHO, ISR_sonar2, CHANGE);
+  attachInterrupt(PIN_SONAR3_ECHO, ISR_sonar3, CHANGE);
 
 }
 
@@ -35,28 +35,51 @@ void setupSonarPins(){
  */
 void updateSonars(){
   byte bitmask = (*sonarBitmask);
+  #ifdef SONAR_DEBUG
+      Serial.print("Active sonar: "); Serial.print(activeSonar);
+      Serial.print(" status: "); Serial.println(status);
+  #endif
   if (status==3) {
     //echo received, let us update distances
+    #ifdef SONAR_DEBUG
+        Serial.println("Echo received");
+    #endif
     numTimeouts[activeSonar]=0;//clear  timeouts counter
     sonarRaw[activeSonar]= MICROS_TO_MM*(pulseEnd-pulseStart-SONAR_DELAY);
     //low pass filter
-    sonarAvg[activeSonar]=0.8*sonarAvg[activeSonar]+2*sonarRaw[activeSonar];
+    sonarAvg[activeSonar]=0.7*sonarAvg[activeSonar]+3*sonarRaw[activeSonar];
     status=0;
   } else if (status && ((micros()-pingSent)>*sonarTimeout)) {
+      #ifdef SONAR_DEBUG
+          Serial.println("Timeout");
+      #endif
     status=0;
-    sonarRaw[activeSonar]=NO_ECHO;
+    sonarRaw[activeSonar]=(*sonarTimeout)*MICROS_TO_MM; //set the raw value to max distance,
+                                          //but do not change the average value yet.
     numTimeouts[activeSonar]++;
-    if (numTimeouts[activeSonar]>3) {
-      sonarAvg[activeSonar]=10*NO_ECHO;
+    if (numTimeouts[activeSonar]>=3) {
+      //after 3 timeouts in a row, change sonarAvg to  max distance value
+      sonarAvg[activeSonar]=10*sonarRaw[activeSonar];
     }
     status=0;
+  } else {
+    #ifdef SONAR_DEBUG
+        Serial.println("Still waiting");
+    #endif
   }
   if ((status==0) && bitmask) {
+      #ifdef SONAR_DEBUG
+          Serial.println("Moving to new sonar");
+      #endif
+
     //determine next active sonar
     do {
       activeSonar++;
       if (activeSonar==NUM_SONARS) activeSonar=0;
     } while (! ( bitmask &(B00000001<<activeSonar) ) ) ;
+    #ifdef SONAR_DEBUG
+        Serial.print("Pinging  sonar "); Serial.println(activeSonar);
+    #endif
 
     //now, do a new ping
     digitalWrite(PINS_SONAR_TRIG[activeSonar], LOW);
@@ -66,6 +89,9 @@ void updateSonars(){
     digitalWrite(PINS_SONAR_TRIG[activeSonar], LOW);
     status=1;
     pingSent=micros();
+    #ifdef SONAR_DEBUG
+        Serial.println("Ping sent");
+    #endif
   }
 
 }
@@ -89,6 +115,7 @@ void ISR_sonar1(){
     }
 }
 void ISR_sonar2(){
+    /*
     if (status && (activeSonar==1) ) {
       if (REG_PORT_IN1 & PORT_PB02) {
         //pin is high - pulse started!
@@ -103,7 +130,7 @@ void ISR_sonar2(){
           status=3;
         }
       }
-    }
+  }*/
 }
 void ISR_sonar3(){
     if (status && (activeSonar==2) ) {

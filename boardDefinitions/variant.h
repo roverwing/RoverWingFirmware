@@ -1,6 +1,6 @@
 /*
 
-   
+
 
   Copyright (c) 2014-2015 Arduino LLC.  All right reserved.
 
@@ -125,8 +125,8 @@ static const uint8_t A6  = PIN_A6 ;
 #define PIN_MOTOR_2B     (24ul)
 #define PIN_ENC_1A       (17ul)
 #define PIN_ENC_1B       (18ul)
-#define PIN_ENC_2A       (22ul)
-#define PIN_ENC_2B       (21ul)
+#define PIN_ENC_2A       (21ul)
+#define PIN_ENC_2B       (22ul)
 
 #define PIN_NEOPIXEL     (33ul)
 
@@ -165,8 +165,8 @@ static const uint8_t A6  = PIN_A6 ;
 /*
  * USB
  */
-#define PIN_USB_DM          (24ul)
-#define PIN_USB_DP          (25ul)
+#define PIN_USB_DM          (25ul)
+#define PIN_USB_DP          (26ul)
 //fake - in fact, host enable pin is not connected
 #define PIN_USB_HOST_ENABLE (37ul)
 /*

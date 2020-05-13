@@ -195,14 +195,14 @@ void setMotorsPower(int16_t power1, int16_t power2){
 void setServos(){
   REG_TCC2_CCB1=servoPosition[0]; //servo1
   REG_TCC2_CCB0=servoPosition[1]; //servo2
-  REG_TCC1_CCB0=servoPosition[2]; //servo3
+  REG_TCC1_CCB0=servoPosition[2]; //servo3  FIXME: should be TCC1.2
   REG_TCC1_CCB1=servoPosition[3]; //servo4
 }
 /* ISR for encoders */
 void ISR_enc1A() {
   bool pina, pinb;
-  pina = REG_PORT_IN0 & PORT_PA14; //fast way to read digital pin PA14=ENC1A
-  pinb = REG_PORT_IN0 & PORT_PA15; //PA15 = ENC1B
+  pina = REG_PORT_IN0 & PORT_PA15; //fast way to read digital pin PA15=ENC1A
+  pinb = REG_PORT_IN0 & PORT_PA14; //PA14 = ENC1B
   if ( pina==pinb ) {
     encoder[0]--;
   } else {
@@ -211,8 +211,8 @@ void ISR_enc1A() {
 }
 void ISR_enc1B() {
   bool pina, pinb;
-  pina = REG_PORT_IN0 & PORT_PA14; // PA14=ENC1A
-  pinb = REG_PORT_IN0 & PORT_PA15; // PA15=ENC1B
+  pina = REG_PORT_IN0 & PORT_PA15; // PA15=ENC1A
+  pinb = REG_PORT_IN0 & PORT_PA14; // PA14=ENC1B
   if ( pina==pinb ) {
     encoder[0]++;
   } else {
@@ -221,8 +221,8 @@ void ISR_enc1B() {
 }
 void ISR_enc2A() {
   bool pina, pinb;
-  pina = REG_PORT_IN0 & PORT_PA21; //PA21=ENC2A
-  pinb = REG_PORT_IN0 & PORT_PA20; //PA20=ENC2B
+  pina = REG_PORT_IN0 & PORT_PA20; //PA20=ENC2A
+  pinb = REG_PORT_IN0 & PORT_PA21; //PA21=ENC2B
   if ( pina==pinb ) {
     encoder[1]--;
   } else {
@@ -231,8 +231,8 @@ void ISR_enc2A() {
 }
 void ISR_enc2B() {
   bool pina, pinb;
-  pina =  REG_PORT_IN0 & PORT_PA21; //PA21=ENC2A
-  pinb =  REG_PORT_IN0 & PORT_PA20; //PA20=ENC2B
+  pina =  REG_PORT_IN0 & PORT_PA20; //PA20=ENC2A
+  pinb =  REG_PORT_IN0 & PORT_PA21; //PA21=ENC2B
   if ( pina==pinb ) {
     encoder[1]++;
   } else {
