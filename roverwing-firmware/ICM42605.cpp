@@ -29,7 +29,7 @@ bool ICM42605begin() {
   i2cMasterWriteByte(ICM42605_ADDRESS, ICM42605_GYRO_CONFIG0, temp | GODR | GSCALE << 5); // gyro full scale and data rate
 
    temp = i2cMasterReadByte(ICM42605_ADDRESS, ICM42605_ACCEL_CONFIG0);
-  i2cMasterWriteByte(ICM42605_ADDRESS, ICM42605_ACCEL_CONFIG0, temp | AODR | GSCALE << 5); // set accel full scale and data rate
+  i2cMasterWriteByte(ICM42605_ADDRESS, ICM42605_ACCEL_CONFIG0, temp | AODR | ASCALE << 5); // set accel full scale and data rate
 
    temp = i2cMasterReadByte(ICM42605_ADDRESS, ICM42605_GYRO_CONFIG1);
   i2cMasterWriteByte(ICM42605_ADDRESS, ICM42605_GYRO_CONFIG1, temp | 0xD0); // set temperature sensor low pass filter to 5Hz, use first order gyro filter
@@ -88,7 +88,8 @@ void ICM42605calibrate(){
       accelOffset[ii]=0;
       gyroOffset[ii]=0;
   }
-  for (ii = 0; ii < 256; ii++) {
+
+  for (ii = 0; ii < 128; ii++) {
     readAccelData();
     accel_bias[0] += accel[0];
     accel_bias[1] += accel[1];
@@ -98,13 +99,15 @@ void ICM42605calibrate(){
     gyro_bias[1] += gyro[1];
     gyro_bias[2] += gyro[2];
     delay(50);
-  }
-  accel_bias[0] /= 256; // Normalize sums to get average count biases
-  accel_bias[1] /= 256;
-  accel_bias[2] /= 256;
-  gyro_bias[0] /= 256;
-  gyro_bias[1] /= 256;
-  gyro_bias[2] /= 256;
+}
+  accel_bias[0] /= 128; // Normalize sums to get average count biases
+  accel_bias[1] /= 128;
+  accel_bias[2] /= 128;
+  //Serial.print("Accel bias (z): "); Serial.println(accel_bias[2]);
+  gyro_bias[0] /= 128;
+  gyro_bias[1] /= 128;
+  gyro_bias[2] /= 128;
+
 
   //remove gravity
   if (accel_bias[0] > G/2)  {
@@ -124,7 +127,7 @@ void ICM42605calibrate(){
   } else if (accel_bias[2] < -G/2) {
     accel_bias[2] += G; // Remove gravity from the z-axis accelerometer bias calculation
   }
-
+  
 
   //save offsets
   for (ii=0; ii<3; ii++){

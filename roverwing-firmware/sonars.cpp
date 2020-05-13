@@ -10,7 +10,7 @@ volatile uint8_t status =0 ; /* 0: ping completed 1: ping initiated
 uint8_t PINS_SONAR_ECHO[]={PIN_SONAR1_ECHO,PIN_SONAR2_ECHO, PIN_SONAR3_ECHO};
 uint8_t PINS_SONAR_TRIG[]={PIN_SONAR1_TRIG,PIN_SONAR2_TRIG, PIN_SONAR3_TRIG};
 
-#define SONAR_DEBUG
+//#define SONAR_DEBUG
 
 
 void setupSonarPins(){
@@ -22,6 +22,7 @@ void setupSonarPins(){
     numTimeouts[i]=0;
   }
   *sonarTimeout = 20000; //20 000 us is about 3m 43 cm max distance
+                         //this is default; it can be changed by user writing this register
   attachInterrupt(PIN_SONAR1_ECHO, ISR_sonar1, CHANGE);
   attachInterrupt(PIN_SONAR2_ECHO, ISR_sonar2, CHANGE);
   attachInterrupt(PIN_SONAR3_ECHO, ISR_sonar3, CHANGE);
@@ -53,9 +54,14 @@ void updateSonars(){
       #ifdef SONAR_DEBUG
           Serial.println("Timeout");
       #endif
+    /*
+    pinMode(PINS_SONAR_ECHO[activeSonar], OUTPUT);
+    digitalWrite(PINS_SONAR_ECHO[activeSonar], LOW);
+    pinMode(PINS_SONAR_ECHO[activeSonar], INPUT);
+    */ 
     status=0;
     sonarRaw[activeSonar]=(*sonarTimeout)*MICROS_TO_MM; //set the raw value to max distance,
-                                          //but do not change the average value yet.
+                                                        //but do not change the average value yet.
     numTimeouts[activeSonar]++;
     if (numTimeouts[activeSonar]>=3) {
       //after 3 timeouts in a row, change sonarAvg to  max distance value
@@ -115,7 +121,6 @@ void ISR_sonar1(){
     }
 }
 void ISR_sonar2(){
-    /*
     if (status && (activeSonar==1) ) {
       if (REG_PORT_IN1 & PORT_PB02) {
         //pin is high - pulse started!
@@ -130,7 +135,7 @@ void ISR_sonar2(){
           status=3;
         }
       }
-  }*/
+  }
 }
 void ISR_sonar3(){
     if (status && (activeSonar==2) ) {

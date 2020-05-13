@@ -56,8 +56,8 @@
 
 // Set initial input parameters
 #define ASCALE 0x03 //accelereation scale: 0x03 is 2g max
-const float aRes = 2.0f/32768.0f;    //accel resolution, in g/LSB
-const int16_t G = 32768/2;           // g in units of accelerometer raw data =1/aRes
+const float aRes = 1.0f/16384.0f;    //accel resolution, in g/LSB
+const int16_t G = 16384;           // g in units of accelerometer raw data =1/aRes
 #define GSCALE 0x02 //gyro scale: 0x02 is 500 deg/s
 const float gRes = 500.0f / 32768.0f; //gyro resolution, in (deg/s)/LSB
 const float gResRad = gRes * PI/180.0f; //gyro resolution, in (rad/s)/LSB
