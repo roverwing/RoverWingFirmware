@@ -91,7 +91,7 @@ void resetEncoders(){
   *encoderReset = 0x00;
   if (b&0x01) { //reset encoder for motor1
     encoder[0]=0;
-    //also, reset previou value, otherwise speed computation will go haywire
+    //also, reset previous value, otherwise speed computation will go haywire
     prevEncoder[0]=0;
   }
   if (b&0x02) { //reset encoder for motor2
@@ -101,7 +101,7 @@ void resetEncoders(){
 }
 
 void updateMotorsConfig(){
-  //first, check if PID coefficinets have changed
+  //first, check if PID coefficients have changed
   if (isSet(FLAG_MOTOR1_PID)){
     //Serial.println("Configuring PID");
     //Serial.println(motor1PID[0]);
@@ -193,9 +193,9 @@ void setMotorsPower(int16_t power1, int16_t power2){
 }
 //setting servo positions
 void setServos(){
-  REG_TCC2_CCB1=servoPosition[0]; //servo1
-  REG_TCC2_CCB0=servoPosition[1]; //servo2
-  REG_TCC1_CCB0=servoPosition[2]; //servo3  FIXME: should be TCC1.2
+  REG_TCC2_CCB0=servoPosition[0]; //servo1
+  REG_TCC2_CCB1=servoPosition[1]; //servo2
+  REG_TCC1_CCB0=servoPosition[2]; //servo3  
   REG_TCC1_CCB1=servoPosition[3]; //servo4
 }
 /* ISR for encoders */

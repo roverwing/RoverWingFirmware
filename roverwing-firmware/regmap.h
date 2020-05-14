@@ -7,7 +7,7 @@
 extern  volatile byte * REGA;
 extern  volatile byte * REGB;
 
-/* REGISTER A - read-only
+/* REGISTER BANK A - read-only
 
 Bytes  Offset name     value               data type  description
 0      REGA_FW_VERSION fwVersion[0]        uint8    firmware version - minor
