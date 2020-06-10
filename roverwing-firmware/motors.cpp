@@ -109,6 +109,7 @@ void updateMotorsConfig(){
     SpeedController1.configure(motor1PID);
     SpeedController1.reset();
     SpeedController1.setTarget(motorTarget[0]);
+    //Serial.print("Motor 1 max speed: "); Serial.println(motorMaxspeed[0]);
   }
   if (isSet(FLAG_MOTOR2_PID)){
     clearFlag(FLAG_MOTOR2_PID);
@@ -135,7 +136,7 @@ void setMotors(){
       power1=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
-      power1=MOTOR_MAX_POWER*SpeedController1.update((float)speed[0]); //500 is maximal power
+      power1=MOTOR_MAX_POWER*(SpeedController1.update((float)speed[0]) + (float)motorTarget[0]/motorMaxspeed[0]); //500 is maximal power
       //cap power
       if (power1>MOTOR_MAX_POWER) power1=MOTOR_MAX_POWER;
       else if (power1<-MOTOR_MAX_POWER) power1=-MOTOR_MAX_POWER;
@@ -150,7 +151,7 @@ void setMotors(){
       power2=POWER_COAST; break;//special value to indicate that it should be floating
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
-      power2=MOTOR_MAX_POWER*SpeedController2.update((float)speed[1]);
+      power2=MOTOR_MAX_POWER*(SpeedController2.update((float)speed[1])+(float)motorTarget[1]/motorMaxspeed[1]);
       if (power2>MOTOR_MAX_POWER) power2=MOTOR_MAX_POWER;
       else if (power2<-MOTOR_MAX_POWER) power2=-MOTOR_MAX_POWER;
       //Serial.print("Power2: "); Serial.println(power2);
@@ -195,7 +196,7 @@ void setMotorsPower(int16_t power1, int16_t power2){
 void setServos(){
   REG_TCC2_CCB0=servoPosition[0]; //servo1
   REG_TCC2_CCB1=servoPosition[1]; //servo2
-  REG_TCC1_CCB0=servoPosition[2]; //servo3  
+  REG_TCC1_CCB0=servoPosition[2]; //servo3
   REG_TCC1_CCB1=servoPosition[3]; //servo4
 }
 /* ISR for encoders */

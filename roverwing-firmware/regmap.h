@@ -138,9 +138,9 @@ Bytes  Offset name     value               data type  description
 ------ MOTOR POWER       -------------
 46-47  REGB_MOTOR_POWER motorPower[0]      int16    motor power, -500...500
 48-49                   motorPower[1]      int16
------- MOTOR STEERING    -------------
-50-51  REGB_MOTOR_STEERING steering[0]     int16  see description in motor.h
-52-53                      steering[1]     int16
+------ MOTOR MAX SPEED    -------------
+50-51  REGB_MOTOR_MAXSPEED motorMaxspeed[0]     uint16  Maximal motor speed, in enc ticks/s
+52-53                      motorMaxspeed[1]     uint16
 54-55  unused
 ------ MOTOR TARGET      -------------
 56-59  REGB_MOTOR_TARGET motorTarget[0]    int32   in speed PID mode: speed  in enc ticks/s
@@ -209,7 +209,7 @@ Bytes  Offset name     value               data type  description
 #define REGB_ENC_RESET         42
 #define REGB_MOTOR_MODE        43
 #define REGB_MOTOR_POWER       46
-#define REGB_MOTOR_STEERING    50
+#define REGB_MOTOR_MAXSPEED    50
 #define REGB_MOTOR_TARGET      56
 #define REGB_IMU_CONFIG        64
 #define REGB_GYRO_OFFSET       66
@@ -295,8 +295,8 @@ extern volatile float    * motor1PID;
 extern volatile float    * motor2PID;
 extern volatile byte     * encoderReset;
 extern volatile uint8_t  * motorMode;
+extern volatile uint16_t  * motorMaxspeed;
 extern volatile int16_t  * motorPower;
-extern volatile int16_t  * steering;
 extern volatile int32_t  * motorTarget;
 //imu, gps, magnetometer
 extern volatile uint8_t * imuConfig;
@@ -332,11 +332,10 @@ extern volatile uint16_t * driveRampTime;
 
 
 
-// flags. Whenever a register is written to, it sets one of the bits in
-// changeFlag (see regmap.cpp) These bits are given names below
 //change flags.  Whenever one of the registers is written to,
 // it sets one of the bits in changeFlag, to indicate
 // to the main loop that it needs processing
+// each individual flag bitmask is given a name below.
 extern uint32_t volatile changeFlag;
 
 // array to map register offsets (for REGB) to flag bits
@@ -353,7 +352,7 @@ extern uint32_t registerFlag[];
 #define FLAG_ENC_RESET     ((1ul)<<5)
 #define FLAG_MOTOR_MODE    ((1ul)<<6)
 #define FLAG_MOTOR_POWER   ((1ul)<<7)
-#define FLAG_MOTOR_STEERING ((1ul)<<8)
+#define FLAG_MOTOR_STEERING ((1ul)<<8) //unused 
 #define FLAG_MOTOR_TARGET  ((1ul)<<9)
 #define FLAG_IMU_CONFIG    ((1ul)<<10)
 #define FLAG_GYRO_OFFSET   ((1ul)<<11)

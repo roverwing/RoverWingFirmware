@@ -37,7 +37,7 @@ uint32_t intPixelColor=GREEN; //color for neopixel
 ///////////////////////////////////////////////////
 void setup() {
   //SerialGPS.begin(9600);
-  i2cMasterBegin(400000); //start I2C bus on Wire1 as master, in fast mode (400 kHz)
+  i2cMasterBegin(100000); //start I2C bus on Wire1 as master, in fast mode (400 kHz)
   i2cSlaveBegin();        //start i2c bus on Wire, as a slave
   initRegmap();
   Serial.begin(9600);

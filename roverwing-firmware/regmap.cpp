@@ -26,7 +26,6 @@ void initRegmap(){
   registerFlag[REGB_ENC_RESET] = FLAG_ENC_RESET;
   for (i=0; i<2; i++)  registerFlag[REGB_MOTOR_MODE+i] = FLAG_MOTOR_MODE;
   for (i=0; i<4; i++)  registerFlag[REGB_MOTOR_POWER+i] = FLAG_MOTOR_POWER;
-  for (i=0; i<4; i++)  registerFlag[REGB_MOTOR_STEERING+i] = FLAG_MOTOR_STEERING;
   for (i=0; i<8; i++)  registerFlag[REGB_MOTOR_TARGET+i] = FLAG_MOTOR_TARGET;
   registerFlag[REGB_IMU_CONFIG] = FLAG_IMU_CONFIG;
   for (i=0; i<6; i++)  registerFlag[REGB_GYRO_OFFSET+i] = FLAG_GYRO_OFFSET;
@@ -109,8 +108,8 @@ volatile float    * motor1PID     = (float *) &REGB[REGB_MOTOR1_PID];
 volatile float    * motor2PID     = (float *) &REGB[REGB_MOTOR2_PID];
 volatile byte     * encoderReset  = &REGB[REGB_ENC_RESET];
 volatile uint8_t  * motorMode     = &REGB[REGB_MOTOR_MODE];
+volatile uint16_t * motorMaxspeed = (uint16_t *) &REGB[REGB_MOTOR_MAXSPEED];
 volatile int16_t  * motorPower    = (int16_t *) &REGB[REGB_MOTOR_POWER];
-volatile int16_t  * steering      = (int16_t *) &REGB[REGB_MOTOR_STEERING];
 volatile int32_t  * motorTarget   = (int32_t *) &REGB[REGB_MOTOR_TARGET];
 //imu, gps, magnetometer
 volatile uint8_t * imuConfig      = &REGB[REGB_IMU_CONFIG];
