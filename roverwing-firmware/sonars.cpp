@@ -46,7 +46,7 @@ void updateSonars(){
         Serial.println("Echo received");
     #endif
     numTimeouts[activeSonar]=0;//clear  timeouts counter
-    sonarRaw[activeSonar]= MICROS_TO_MM*(pulseEnd-pulseStart-SONAR_DELAY);
+    sonarRaw[activeSonar]= MICROS_TO_MM*(pulseEnd-pulseStart);
     //low pass filter
     sonarAvg[activeSonar]=0.7*sonarAvg[activeSonar]+3*sonarRaw[activeSonar];
     status=0;
@@ -58,7 +58,7 @@ void updateSonars(){
     pinMode(PINS_SONAR_ECHO[activeSonar], OUTPUT);
     digitalWrite(PINS_SONAR_ECHO[activeSonar], LOW);
     pinMode(PINS_SONAR_ECHO[activeSonar], INPUT);
-    */ 
+    */
     status=0;
     sonarRaw[activeSonar]=(*sonarTimeout)*MICROS_TO_MM; //set the raw value to max distance,
                                                         //but do not change the average value yet.
