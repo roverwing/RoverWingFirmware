@@ -131,15 +131,20 @@ void setMotors(){
   // determine powers
   switch (motorMode[0]){
     case MOTOR_MODE_POWER:
-      power1=motorPower[0]; break;
+      power1=motorPower[0];
+      //Serial.print("Setting motor 1 in MOTOR_MODE_POWER to power "); Serial.println(power1);
+      break;
     case MOTOR_MODE_COAST:
       power1=POWER_COAST; break;//special value to indicate that it should be floating
+      //Serial.println("Setting motor 1 to coast ");
     case MOTOR_MODE_SPEEDPID:
       //get the current measured speed and use it to update PID controller
       power1=MOTOR_MAX_POWER*(SpeedController1.update((float)speed[0]) + (float)motorTarget[0]/motorMaxspeed[0]); //500 is maximal power
       //cap power
       if (power1>MOTOR_MAX_POWER) power1=MOTOR_MAX_POWER;
       else if (power1<-MOTOR_MAX_POWER) power1=-MOTOR_MAX_POWER;
+      //Serial.print("Setting motor 1 in MOTOR_MODE_SPEEDPID to power "); Serial.println(power1);
+
       //Serial.print("Power1: "); Serial.println(power1);
       break;
   }
@@ -191,6 +196,7 @@ void setMotorsPower(int16_t power1, int16_t power2){
     REG_TCC0_CCB0=MOTOR_MAX_POWER+power2;
     REG_TCC0_CCB1=MOTOR_MAX_POWER;
   }
+  //Serial.print("Motor powers: "); Serial.print( power1); Serial.print(", "); Serial.println(power2);
 }
 //setting servo positions
 void setServos(){

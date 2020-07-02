@@ -17,7 +17,7 @@ bool ICM42605isAvailable(){
 bool ICM42605begin() {
   quat[0]=1.0f; quat[1]=0.0f;  quat[2]=0.0f; quat[3]=0.0f;
   if (!ICM42605isAvailable()) {
-    Serial.println("Failed to connect to MPU050");
+    Serial.println("Failed to connect to IMU");
     *imuStatus = IMU_ERROR;
     return false;
   }
@@ -127,7 +127,7 @@ void ICM42605calibrate(){
   } else if (accel_bias[2] < -G/2) {
     accel_bias[2] += G; // Remove gravity from the z-axis accelerometer bias calculation
   }
-  
+
 
   //save offsets
   for (ii=0; ii<3; ii++){

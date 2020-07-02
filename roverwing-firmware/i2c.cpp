@@ -34,11 +34,10 @@ void i2cMasterReadBytes(uint8_t address, uint8_t regAddress, uint8_t count, uint
   Wire1.beginTransmission(address);   // Initialize the Tx buffer
   Wire1.write(regAddress);            // Put slave register address in Tx buffer
   Wire1.endTransmission();       // Send the Tx buffer, but send a restart to keep connection alive
-  uint8_t byteRead = Wire1.requestFrom(address, count);  // Read bytes from slave register address
-  if (byteRead == count) {
-      for (uint8_t i=0; i<count; i++) {
-          dest[i] = Wire1.read();
-      }
+  uint8_t i = 0;
+  Wire1.requestFrom(address, count);  // Read bytes from slave register address
+  while (Wire1.available()) {
+    dest[i++] = Wire1.read();
   }         // Put read results in the Rx buffer
 }
 
@@ -75,7 +74,7 @@ void i2cSlaveReceiveEvent(int bytesReceived){
     } else {
       //set flag and let the main loop deal with it
       setFlag(registerFlag[offset]);
-      //Serial.println(changeFlag, BIN);
+      //Serial.print("received data at offset ");Serial.println(offset);
     }
   } else {
     requestAddress=offset; //save for request handler

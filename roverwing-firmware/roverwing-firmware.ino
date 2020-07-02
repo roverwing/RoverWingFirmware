@@ -13,10 +13,10 @@
 #include "drive.h"
 
 
-#define FW_VERSION_MAJOR 1
-#define FW_VERSION_MINOR 6
+#define FW_VERSION_MAJOR 2
+#define FW_VERSION_MINOR 1
 //uncomment to allow debugging print to Serial.
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 
 
 //script own variables
@@ -28,7 +28,7 @@ bool blink=false;
 //int16_t motorDelta = 25;
 //int16_t servoDelta = 50;
 float voltage=0;
-const float voltageScale=(3.3/1023.0)*(122.0/22.0); //voltage divider uses 100k and 22k resistors
+const float voltageScale=(3.3/1023.0)*(1+37.4/9.53); //voltage divider uses 100k and 22k resistors
 uint32_t loopCount=0;
 uint32_t loop2Count=0; //for low priority loop
 uint32_t intPixelColor=GREEN; //color for neopixel
@@ -37,7 +37,7 @@ uint32_t intPixelColor=GREEN; //color for neopixel
 ///////////////////////////////////////////////////
 void setup() {
   //SerialGPS.begin(9600);
-  i2cMasterBegin(100000); //start I2C bus on Wire1 as master, in fast mode (400 kHz)
+  i2cMasterBegin(100000); //start I2C bus on Wire1 as master, in regular mode (100 kHz)
   i2cSlaveBegin();        //start i2c bus on Wire, as a slave
   initRegmap();
   Serial.begin(9600);
@@ -59,7 +59,7 @@ void setup() {
     servoPosition[i] = 1500;
   }
   //
-  *imuStatus = 0x05;
+  *imuStatus = IMU_OFF;
   *gpsStatus = GPS_OFF;
   *magStatus = MAG_OFF;
   //neopixels
@@ -68,9 +68,6 @@ void setup() {
   intPixelUpdate(BLUE);
   pixelShow();
   //delay(3000);
-  if  (ICM42605isAvailable()) {
-    Serial.println("IMU is available");
-  }
 }
 
 void loop() {
@@ -103,8 +100,8 @@ void loop() {
     clearFlag(FLAG_MOTOR_POWER);
 #ifdef DEBUG_PRINT
     Serial.println("Updating motor mode/power  configuration");
-    Serial.print("Motor1 mode: "); Serial.println(motorMode[0] );
-    Serial.print("Motor2 mode: "); Serial.println(motorMode[1] );
+    Serial.print("Motor1 mode: "); Serial.print(motorMode[0] ); Serial.print(" power: "); Serial.println(motorPower[0]);
+    Serial.print("Motor2 mode: "); Serial.print(motorMode[1] ); Serial.print(" power: "); Serial.println(motorPower[0]);
 #endif
     setMotors();
   }

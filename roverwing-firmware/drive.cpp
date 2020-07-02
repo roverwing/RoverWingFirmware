@@ -40,6 +40,7 @@ float distanceUnit; //how many encoder ticks rover travels in 1 sec at power=1 (
 void driveSetup(){
   if (*driveMode==DRIVE_OFF){
     *driveStatus=DRIVE_STATUS_COMPLETE;
+    //Serial.println("Drive: turnign motors off 3");
     setMotorsPower(0,0);
     return;
   }
@@ -118,6 +119,7 @@ void driveUpdateMotors(){
       //less than 1/10 sec travel time at our speed - time to stop
       *driveStatus=DRIVE_STATUS_COMPLETE;
       *driveMode=DRIVE_OFF;
+      //Serial.println("Drive: turnign motors off");
       setMotorsPower(0,0);
       return;
     } else {
@@ -150,6 +152,7 @@ void driveUpdateMotors(){
         //less than 3 degree to turn, time to stop
         *driveStatus=DRIVE_STATUS_COMPLETE;
         *driveMode=DRIVE_OFF;
+        //Serial.println("Drive: turnign motors off 2");
         setMotorsPower(0,0);
         return;
       } else if (dYaw<200) {
@@ -163,5 +166,6 @@ void driveUpdateMotors(){
       power1=power*turnDir*motorTurnDir[0];
       power2=power*turnDir*motorTurnDir[1];
   }
+  //Serial.println("Drive: setting motors");
   setMotorsPower(power1, power2);
 }
