@@ -82,6 +82,13 @@ void loop() {
 #endif
     setServos();
   }
+  if (isSet(FLAG_DRIVE_MODE)) {
+    clearFlag(FLAG_DRIVE_MODE);
+#ifdef DEBUG_PRINT
+    Serial.println("Setting drive mode");
+#endif
+    driveSetup();
+  }
   if (isSet(FLAG_ENC_RESET)) {
     clearFlag(FLAG_ENC_RESET);
 #ifdef DEBUG_PRINT
@@ -193,14 +200,6 @@ void loop() {
       pixelShow(); //pushes changes to hardware
     }
   }
-  if (isSet(FLAG_DRIVE_MODE)) {
-    clearFlag(FLAG_DRIVE_MODE);
-#ifdef DEBUG_PRINT
-    Serial.println("Setting drive mode");
-#endif
-    driveSetup();
-  }
-
 
   /**********************************************
    * now, update all sensors
