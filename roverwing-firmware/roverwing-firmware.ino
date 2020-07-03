@@ -14,7 +14,7 @@
 
 
 #define FW_VERSION_MAJOR 2
-#define FW_VERSION_MINOR 1
+#define FW_VERSION_MINOR 2
 //uncomment to allow debugging print to Serial.
 //#define DEBUG_PRINT
 
@@ -32,7 +32,6 @@ const float voltageScale=(3.3/1023.0)*(1+(37.4/9.53)); //voltage divider uses 37
 uint32_t loopCount=0;
 uint32_t loop2Count=0; //for low priority loop
 uint32_t intPixelColor=GREEN; //color for neopixel
-
 
 ///////////////////////////////////////////////////
 void setup() {

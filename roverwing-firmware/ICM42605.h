@@ -1,5 +1,17 @@
 #include "Arduino.h"
+#include <FlashStorage.h>
 #define ICM42605_ADDRESS    0x68   // Address of ICM42605 accel/gyro when ADO = LOW
+
+//offsets data
+//flash storage stuff
+typedef struct {
+  boolean valid;
+  int16_t gyro[3];
+  int16_t accel[3];
+} offsets_t;
+
+
+
 
 //statuses
 #define IMU_OFF 0x00

@@ -2,10 +2,16 @@
 #include "ICM42605.h"
 #include "regmap.h"
 
+//variable ofr offsets stored in flash memory
+
 
 //for keeping track of time
 float IMUdeltat = 0.0f;                              // integration time interval
 uint32_t IMUlastUpdate=0;
+
+// Reserve a portion of flash memory to store a "offsets_t" data  and
+// call it "offsets_flash_storage".
+FlashStorage(offsets_flash_storage, offsets_t);
 
 
 
@@ -15,6 +21,9 @@ bool ICM42605isAvailable(){
 }
 
 bool ICM42605begin() {
+
+  offsets_t savedOffsets;
+
   quat[0]=1.0f; quat[1]=0.0f;  quat[2]=0.0f; quat[3]=0.0f;
   if (!ICM42605isAvailable()) {
     Serial.println("Failed to connect to IMU");
@@ -56,8 +65,13 @@ bool ICM42605begin() {
    temp = i2cMasterReadByte(ICM42605_ADDRESS, ICM42605_REG_BANK_SEL);
   i2cMasterWriteByte(ICM42605_ADDRESS, ICM42605_REG_BANK_SEL, temp & ~(0x07) ); // select Bank 0
 
-
-
+  //now, get the offsets from flash memory
+  savedOffsets=offsets_flash_storage.read();
+  //and copy them to accelOffset, gyroOffset
+  for (int i=0; i<3; i++){
+      accelOffset[i]=savedOffsets.accel[i];
+      gyroOffset[i]=savedOffsets.gyro[i];
+  }
   //finishing up
   *imuStatus = IMU_OK;
   return true;
@@ -81,6 +95,8 @@ void readGyroData() {
 
 void ICM42605calibrate(){
   uint8_t ii;
+  offsets_t savedOffsets;
+
   int32_t gyro_bias[3] = {0, 0, 0}, accel_bias[3] = {0, 0, 0};
   *imuStatus = IMU_CALIBRATING;
   //zero the offsets
@@ -133,7 +149,12 @@ void ICM42605calibrate(){
   for (ii=0; ii<3; ii++){
     accelOffset[ii]=accel_bias[ii];
     gyroOffset[ii]=gyro_bias[ii];
+    //and prepare data for saving  to flash memory
+    savedOffsets.accel[ii]=accel_bias[ii];
+    savedOffsets.gyro[ii]=gyro_bias[ii];
   }
+  //save to flash memory
+  offsets_flash_storage.write(savedOffsets);
   *imuStatus = IMU_OK;
 
 }
