@@ -24,10 +24,13 @@ void PIDcontroller::reset(){
   target=0;
   prevError=0;
   intError=0;
-  justReset=true;
+  lastReset=micros();
 }
 void PIDcontroller::setTarget(volatile float t){
   target=t;
+  prevError=0;
+  intError=0;
+  lastReset=micros();
   //Serial.print("PID target: ");Serial.println(t);
 }
 float PIDcontroller::update(float reading){
@@ -36,18 +39,17 @@ float PIDcontroller::update(float reading){
   float deltat;
   uint32_t now=micros();
   error=target-reading;
-  if (!justReset) {
-    //if this is not the first reading, compute integral and derivative error
-    deltat=(now-lastUpdate)*0.000001f; //time in seconds
-    intError+=error*deltat;
-    if (Ilim>0){ //limit the integral error, to prevent integral windup
-      if (intError>Ilim) intError=Ilim;
-      else if (intError<-Ilim) intError=-Ilim;
-    }
-    dError=(error-prevError)/deltat;
-  } else {
-    //first reading after reset
-    justReset=false;
+
+  if (now-lastReset>300000){
+      //reset was more than 0.3 s ago - can use integral and derivative terms
+      //otherwise, ignore P and D terms - too much volatility
+      deltat=(now-lastUpdate)*0.000001f; //time in seconds
+      intError+=error*deltat;
+      if (Ilim>0){ //limit the integral error, to prevent integral windup
+        if (intError>Ilim) intError=Ilim;
+        else if (intError<-Ilim) intError=-Ilim;
+      }
+      dError=(error-prevError)/deltat;
   }
   lastUpdate=now;
   prevError=error;

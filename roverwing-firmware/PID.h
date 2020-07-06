@@ -16,6 +16,6 @@ class PIDcontroller {
     float target;
     float prevError, intError;
     uint32_t lastUpdate; //time in us
-    bool justReset;
+    uint32_t lastReset; //time in us
 };
 #endif
