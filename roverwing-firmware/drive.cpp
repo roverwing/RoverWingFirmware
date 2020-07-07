@@ -158,8 +158,9 @@ void driveUpdateMotors(){
       } else if (dYaw<200) {
         //20 degrees left - time to slow down; have speed proportional to angle to turn
         power=(*driveTargetPower)*(float)dYaw/200.0f;
-        //but do not go below the minimal power
-        if (power < *driveMinPower) power=*driveMinPower;
+        //but do not go below double the minimal power (minimal power to turn
+        //is usually much higher than minimal power to drive straight )
+        if (power < (*driveMinPower)*2 ) power=(*driveMinPower)*2;
       }
       //otherwise, do not change power from what it was
       //now, setup power1, power2
@@ -167,5 +168,12 @@ void driveUpdateMotors(){
       power2=power*turnDir*motorTurnDir[1];
   }
   //Serial.println("Drive: setting motors");
+  //clamp power, just in case:
+  uint16_t m=max(abs(power1), abs(power2));
+  if (m>MOTOR_MAX_POWER){
+      float k=(float)MOTOR_MAX_POWER/m;
+      power1 *=k;
+      power2 *=k;
+  }
   setMotorsPower(power1, power2);
 }
