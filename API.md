@@ -21,6 +21,7 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 ## Register bank A - read-only
 
 |register(s)|  Name              | data type      |           Value | comment |
+|------------|-------------------| ---------------|-----------------| --------|
 | 0          | REGA_FW_VERSION   |    uint8       | firmware version - minor|
 | 1          |                   |     uint8      | fw version major|
 | 2-3        | REGA_ANALOG_RAW   |  uint16        | Raw reading of analog 0 (voltage), 0-1023;
@@ -30,3 +31,4 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 | 10-11      |                   |  uint16        | Raw reading of analog 4, 0-1023|
 | 12-13      |                   |  uint16        | Raw reading of analog 5, 0-1023|
 | 14-15      |                   |  uint16        | Raw reading of analog 6, 0-1023|
+|------------|-------------------| ---------------|-----------------| --------|
