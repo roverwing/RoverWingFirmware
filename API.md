@@ -20,7 +20,7 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 
 ## Register bank A - read-only
 
-|register(s)|  Name              | data type      |           Value             | 
+|register(s)|  Name              | data type      |           Value             |
 |------------|-------------------| ---------------|-----------------------------|
 | 0          | REGA_FW_VERSION   |  uint8         | firmware version - minor    |
 | 1          |                   |  uint8         | fw version major            |
@@ -87,6 +87,72 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 | 136        | REGA_DRIVE_STATUS |   byte         |
 | 137        |                   |                | unused
 | 138-139    | REGA_DEBUG        | int16          | for debugging purposes
-| 140-141    |                   | int16          |
-| 142-143    |                   | int16          |
-|------------|-------------------|----------------|----------------------------|
+| 140-141    |                   | int16          | same
+| 142-143    |                   | int16          | same
+
+
+
+## REGISTER B - write-only
+
+|register(s)|  Name             | data type     |           Value             |
+|---------|---------------------| --------------|-----------------------------|
+| 0       | REGB_ANALOG_BITMASK | byte          | bitmask of active analog sensors, LSB=analog1 analog0=vsense - always active
+| 1       | REGB_SONAR_BITMASK  | byte          | bitmask of active sonars, LSB=sonar1
+| 2-3     | REGB_SONAR_TIMEOUT  | uint16        | timeout for waiting for sonar echo, in us
+| 4-5     | REGB_SERVO          | uint16        | pulse width for servo1, in us (500-2500)
+| 6-7     |                     | uint16        | same for servo2
+| 8-9     |                     | uint16        | same for servo3
+| 10-11   |                     | uint16        | same for servo4              
+| 12-27   | REGB_MOTOR1_PID     | float[4]      | PID coefficients for Motor1
+| 28-41   | REGB_MOTOR2_PID     | float[4]      | PID coefficients for Motor2
+| 42      | REGB_ENC_RESET      | byte          | bit 0: reset motor1 encoder; bit 1: motor 2
+| 43      | REGB_MOTOR_MODE     | byte          | motor1 mode
+| 44      |                     | byte          | motor2 mode
+| 45      |                     |               | unused
+| 46-47   | REGB_MOTOR_POWER    | int16         | motor1 power, -500...500
+| 48-49   |                     | int16         | same, motor 2
+| 50-51   | REGB_MOTOR_MAXSPEED | uint16        | Maximal motor1 speed, in enc ticks/s
+| 52-53   |                     | uint16        | Same, motor2
+| 54-55   |                     |               | unused    
+| 56-59   | REGB_MOTOR_TARGET   | int32         | in speed PID mode: motor1 target speed  in enc ticks/s
+| 60-63   |                     | int32         | same for motor2
+| 64      | REGB_IMU_CONFIG     | byte          | bit0: is IMU active?; bits 2:1 : IMU orientation
+| 65      |                     |               | unused
+| 66-67   | REGB_GYRO_OFFSET    | int16         | gyro offset x, provided by user
+| 68-69   |                     | int16         | y
+| 70-71   |                     | int16         | z
+| 72-73   | REGB_ACCEL_OFFSET   | int16         | accel offset x, provided by user
+| 74-75   |                     | int16         | y
+| 76-77   |                     | int16         | z
+| 78      | REGB_MAG_CONFIG     | byte          | magnetometrr mode - see definition in mag.h
+| 79      |                     |               | unused
+| 80-81   | REGB_MAG_OFFSET     | int16         | x-offset for magnetometer provided by user
+| 82-83   |                     | int16         | y-offset for magnetometer
+| 84-85   |                     | int16         | z-offset for magnetometer
+| 86-87   | REGB_MAG_MATRIX     | int16         | (soft iron matrix)*1000 - entry [0][0]
+| 88-89   |                     | int16         | [0][1]
+| 90-91   |                     | int16         | [0][2]
+| 92-93   |                     | int16         | [1][0]
+| 94-95   |                     | int16         | [1][1]
+| 96-97   |                     | int16         | [1][2]
+| 98-99   |                     | int16         | [2][0]
+| 100-101 |                     | int16         | [2][1]
+| 102-103 |                     | int16         | [2][2]
+| 104     | REGB_GPS_CONFIG     | byte          | 1 if we need to activate gps
+| 105     | REGB_LOW_VOLTAGE    | uint8_t       | the low voltage threshold, in units of 0.1V.  if voltage is below that, internal neopixel will blink red
+| 106     | REGB_NUM_PIXELS     | uint8         | actual number of used neopixels (at most 255);  doesn't include internal neopixel
+| 107     | REGB_PIXEL_BRIGHTNESS | uint8       | neopixel brightness, 0-255
+| 108-111 | REGB_PIXEL_COLOR    | uint32        | neopixel color data  (nnRRGGBB), where nn is the pixel index (1-255)
+| 112     | REGB_PIXEL_COMMAND  | uint8         | command to start/update/stop pixels
+| 113     | REGB_DRIVE_MODE     | byte          |
+| 114     | REGB_DRIVE_MOTORCONFIG | byte       | info about which motor is left/right, etc. See details in drive.cpp
+| 115     |                     |               | unused
+| 116-117 | REGB_DRIVE_MAXSPEED | uint16        | maximal possible speed, in encoder ticks/s; determined by the motor
+| 118-119 | REGB_DRIVE_MAXTURNSPEED | uint16    | maximal turning speed, in deg/s
+| 120-121 | REGB_DRIVE_MINPOWER | uint16        | minimal power necessary for the robot to move when driving straight (0-500)
+| 122-123 |                     |               | unused
+| 124-139 | REGB_DRIVE_PID_COEF | float[4]      | PID coefficients for driving straight using IMU
+| 140-143 | REGB_DRIVE_DISTANCE | int32         | distance to drive, in encoder ticks. Always positive, even when going backwards
+| 144-145 | REGB_DRIVE_HEADING  | int16         | target value of heading (as yaw angle), in units of 0.1 deg. Must be between -1800 and 1800
+| 146-147 | REGB_DRIVE_TARGETPOWER | int16      | requested  power, -500...500. For driving backwards must be negative
+| 148-149 | REGB_DRIVE_RAMPTIME    | uint16     | time for ramping speed from 0 to full, in ms
