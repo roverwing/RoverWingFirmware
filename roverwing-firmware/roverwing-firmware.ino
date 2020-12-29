@@ -14,7 +14,7 @@
 
 
 #define FW_VERSION_MAJOR 2
-#define FW_VERSION_MINOR 3
+#define FW_VERSION_MINOR 99
 //uncomment to allow debugging print to Serial.
 //#define DEBUG_PRINT
 
@@ -41,7 +41,7 @@ void setup() {
   initRegmap();
   Serial.begin(9600);
   //delay(2000);
-  Serial.println("Starting RoverWing");
+  //Serial.println("Starting RoverWing");
 
   setupTimers();
   setupMotorPins();
@@ -122,10 +122,9 @@ void loop() {
     break;
   case IMU_CONFIG_BEGIN://begin
     *imuStatus = 33; //FIXME
-    Serial.println("starting IMU");
+    //Serial.println("starting IMU");
     ICM42605begin();
-    Serial.println("IMU Started");
-    //*imuStatus += 7;
+    //Serial.println("IMU Started");
     break;
   case IMU_CONFIG_CALIBRATE: //calibrate
     ICM42605calibrate();
@@ -246,7 +245,7 @@ void loop() {
     //if using PID for motors, update motor power
     if ((motorMode[0] == MOTOR_MODE_SPEEDPID) ||(motorMode[1] == MOTOR_MODE_SPEEDPID) ){
 #ifdef DEBUG_PRINT
-     Serial.println("Updatign motors using PID");
+     Serial.println("Updating motors using PID");
 #endif
       setMotors();
       //Serial.println("Setting PID");
