@@ -13,8 +13,8 @@
 #include "drive.h"
 
 
-#define FW_VERSION_MAJOR 2
-#define FW_VERSION_MINOR 99
+#define FW_VERSION_MAJOR 3
+#define FW_VERSION_MINOR 0
 //uncomment to allow debugging print to Serial.
 //#define DEBUG_PRINT
 
@@ -269,6 +269,7 @@ void loop() {
       //compute voltage
       voltage = (float) analogAvg[0]*0.1*voltageScale;
       //Serial.print("Voltage: "); Serial.println(voltage);
+      //Serial.print("Filtered value: "); Serial.println(analogAvg[0]);
       //check voltage limit
       if (voltage<(*lowVoltage)*0.1f) {
         intPixelColor = RED;

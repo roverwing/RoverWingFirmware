@@ -96,7 +96,7 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 
 |register(s)|  Name             | data type     |           Value             |
 |---------|---------------------| --------------|-----------------------------|
-| 0       | REGB_ANALOG_BITMASK | byte          | bitmask of active analog sensors, LSB=analog1 analog0=vsense - always active
+| 0       | REGB_ANALOG_BITMASK | byte          | bitmask of active analog sensors, LSB=analog1 (currently unused)
 | 1       | REGB_SONAR_BITMASK  | byte          | bitmask of active sonars, LSB=sonar1
 | 2-3     | REGB_SONAR_TIMEOUT  | uint16        | timeout for waiting for sonar echo, in us
 | 4-5     | REGB_SERVO          | uint16        | pulse width for servo1, in us (500-2500)
@@ -156,3 +156,79 @@ reading of analog sensor 0, which is a 16-bit integer stored in registers 2 and
 | 144-145 | REGB_DRIVE_HEADING  | int16         | target value of heading (as yaw angle), in units of 0.1 deg. Must be between -1800 and 1800
 | 146-147 | REGB_DRIVE_TARGETPOWER | int16      | requested  power, -500...500. For driving backwards must be negative
 | 148-149 | REGB_DRIVE_RAMPTIME    | uint16     | time for ramping speed from 0 to full, in ms
+
+## Detailed description of operation
+
+### Analogs
+All analog sensor readings  are constantly updated, in each iteration of the
+loop. Raw results are saved to REGA_ANALOG_RAW registers, and low-pass filtered
+results are saved to REGA_ANALOG registers. Currently there are no registers to
+to modify this behavior. (REGB_ANALOG_BITMASK is there for future use)
+
+### Sonars
+To activate sonars, MCU has to write bitmask of active sonars to
+REGB_SONAR_BITMASK; optionally, also write max timeout (in us) to
+REGB_SONAR_TIMEOUT. The timeout is shared by all sonars.
+After that, sonars are fired in sequence, and raw results are written to
+REGA_SONAR_RAW, and low-pass filtered results are written to REGA_SONAR.
+
+### Servos
+To set position for a servo, write the corresponding pulse width (in us) to
+REGB_SERVO registers. There is no feedback.
+
+### Motors: overview  
+Motors can operate in one of several modes:
+
+- **Power mode**: each motor is given a power of -500...500 (directly translated to
+  PWM duty cycle). This is the default
+  **Coast mode**: motor is given 0 power and is set to coast
+- **PID Mode** (requires encoders): each motor is given target speed, and uses PID
+  controller to control speed trying to keep the target speed
+- **Tank drive mode**: both motors are controlled by higher level commands - see below.
+
+The mode is determined by combination of two registers: REGB_DRIVE_MODE and
+REGB_MOTOR_MODE.
+
+To set one or both  motors to Power mode or PID mode,  write  DRIVE_OFF (=0x00)
+value to  REGB_DRIVE_MODE, and then  
+write the appropriate value to REGB_MOTOR_MODE. The values are defined in `motors.h`:
+```
+#define MOTOR_MODE_POWER 0
+#define MOTOR_MODE_COAST 1
+#define MOTOR_MODE_SPEEDPID 2
+```
+
+To set both motors to tank drive mode, write one of possible drive mode values
+to REGB_DRIVE_MODE (see separate section below). This automatically changes
+REGB_MOTOR_MODE[x] to special value MOTOR_MODE_TANKDRIVE.
+
+
+### Motors: power drive
+For each of the motors, if the motor is placed in MOTOR_MODE_POWER, motor power
+(i.e. PWM duty cycle) is determined by value placed in REGB_MOTOR_POWER[i].
+The value must range from -500...500. Value 0 corresponds to motor braking.
+
+### Motors: coast mode
+In this mode, motor is given 0 power and is set to coast (i.e. rotate freely).
+
+### Encoders
+The firmware is constantly  listening for signals from encoders and is updating the
+values of REGA_ENCODER[x]. It also updates REGA_SPEED[x] (about
+25 times/sec).
+
+To reset encoder counts, write the byte to REGB_ENC_RESET. Writing 0x01 resets encoder 1,
+writing 0x02 resets encoder 2, and writing their sum (i.e. 0x03) resets both.
+
+### Motors: PID mode
+Before using this mode, MCU must
+
+- set the PID parameters for corresponding motor  by writing to REGB_MOTORx_PID.
+  Structure of these coefficients is explained separately
+- write motor max speed (in ticks/s), corresponding to motor power of 100%,  
+  to REGB_MOTOR_MAXSPEED[x]
+
+After this is done, MCU must write motor target speed to REGB_MOTOR_TARGET[x]
+and finally set the mode by writing to REGB_MOTOR_MODE.
+
+In power mode, values of REGB_MOTOR_TARGET and REGB_MOTOR_MAXSPEED are ignored
+but not changed.
